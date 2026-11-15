@@ -1,0 +1,673 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f6f7f9">
+  <title>FlashPort — File sharing</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f6f7f9;
+      --surface: #fff;
+      --line: #e4e7ec;
+      --text: #20242c;
+      --muted: #737b88;
+      --accent: #4058d6;
+      --accent-soft: #eef0ff;
+      --green: #23845b;
+      --red: #bd3d4b;
+      --shadow: 0 12px 32px rgb(25 35 60 / 6%);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font: 15px/1.5 "Segoe UI", system-ui, sans-serif;
+    }
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+    button:disabled { cursor: not-allowed; opacity: .55; }
+    .page { width: min(760px, calc(100% - 32px)); margin: 0 auto; padding: 38px 0 64px; }
+    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; }
+    .brand { display: flex; align-items: center; gap: 11px; font-size: 19px; font-weight: 750; letter-spacing: -.04em; }
+    .brand-mark {
+      display: grid; width: 35px; height: 35px; place-items: center;
+      border-radius: 11px; background: var(--accent); color: #fff; font-size: 18px;
+    }
+    .connection { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 12px; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); }
+    h1 { margin: 0; font-size: clamp(27px, 5vw, 36px); letter-spacing: -.045em; line-height: 1.15; }
+    .intro { margin: 8px 0 25px; color: var(--muted); }
+    .panel {
+      margin-top: 16px; padding: 22px; background: var(--surface);
+      border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow);
+    }
+    .panel-heading { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 15px; }
+    h2 { margin: 0; font-size: 16px; letter-spacing: -.015em; }
+    .subtle { color: var(--muted); font-size: 12px; }
+    .receiver-controls { display: flex; gap: 9px; }
+    input[type="text"] {
+      min-width: 0; flex: 1; padding: 10px 12px; border: 1px solid var(--line);
+      border-radius: 9px; color: var(--text); background: #fff; outline: none;
+    }
+    input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgb(64 88 214 / 12%); }
+    .button {
+      border: 0; border-radius: 9px; padding: 10px 15px;
+      background: var(--accent); color: #fff; font-weight: 650;
+    }
+    .button.secondary { background: #f0f1f4; color: #414854; }
+    .button.small { padding: 8px 12px; font-size: 13px; }
+    .receiver-active { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .receiver-active strong { color: var(--green); font-size: 13px; }
+    .drop-zone {
+      display: grid; min-height: 190px; place-items: center; text-align: center;
+      padding: 24px; border: 1.5px dashed #c9cde0; border-radius: 13px;
+      background: #fafaff; transition: background .15s, border-color .15s;
+    }
+    .drop-zone.dragging { border-color: var(--accent); background: var(--accent-soft); }
+    .upload-icon {
+      display: grid; width: 43px; height: 43px; margin: 0 auto 10px; place-items: center;
+      border-radius: 13px; background: var(--accent-soft); color: var(--accent); font-size: 21px;
+    }
+    .drop-title { margin: 0 0 4px; font-weight: 650; }
+    .drop-help { color: var(--muted); font-size: 12px; }
+    .browse { color: var(--accent); font-weight: 650; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+    .selected-file {
+      display: flex; align-items: center; justify-content: space-between; gap: 14px;
+      margin-top: 12px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px;
+    }
+    .file-title { overflow: hidden; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+    .file-size { color: var(--muted); font-size: 12px; white-space: nowrap; }
+    .receiver-list { display: grid; gap: 8px; }
+    .receiver-option {
+      display: flex; align-items: center; gap: 11px; min-height: 54px;
+      padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px;
+    }
+    .receiver-option:has(input:checked) { border-color: #b7c0ff; background: #fafaff; }
+    .receiver-option input { width: 16px; height: 16px; accent-color: var(--accent); }
+    .receiver-name { flex: 1; font-weight: 600; }
+    .online { color: var(--green); font-size: 11px; }
+    .empty { padding: 18px 12px; color: var(--muted); text-align: center; font-size: 13px; }
+    .send-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 17px; }
+    .send-help { color: var(--muted); font-size: 12px; }
+    .button.send { min-width: 132px; padding: 12px 18px; }
+    .message { min-height: 20px; margin: 10px 0 0; color: var(--muted); font-size: 12px; }
+    .message.error { color: var(--red); }
+    .delivery { padding: 15px 0; border-top: 1px solid var(--line); }
+    .delivery:first-child { border-top: 0; padding-top: 0; }
+    .delivery-file { margin-bottom: 10px; font-size: 13px; font-weight: 650; }
+    .delivery-row { display: grid; grid-template-columns: minmax(110px, 1fr) 2fr 95px; align-items: center; gap: 12px; margin-top: 8px; font-size: 12px; }
+    .delivery-recipient { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .progress-track { height: 7px; overflow: hidden; border-radius: 9px; background: #eceef2; }
+    .progress-fill { width: 0; height: 100%; border-radius: inherit; background: var(--accent); transition: width .25s ease; }
+    .transfer-state { color: var(--muted); text-align: right; }
+    .transfer-state.done { color: var(--green); font-weight: 650; }
+    .receive-job { padding: 12px 0; border-top: 1px solid var(--line); }
+    .receive-job:first-child { border-top: 0; }
+    .receive-job-title { font-weight: 600; font-size: 13px; }
+    .receive-job-status { color: var(--muted); font-size: 12px; }
+    [hidden] { display: none !important; }
+    @media (max-width: 540px) {
+      .page { padding-top: 24px; }
+      .panel { padding: 17px; }
+      .receiver-controls { align-items: stretch; flex-direction: column; }
+      .receiver-active, .send-row { align-items: stretch; flex-direction: column; }
+      .send-help { order: 2; }
+      .delivery-row { grid-template-columns: 1fr auto; gap: 7px; }
+      .progress-track { grid-column: 1 / -1; grid-row: 2; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header>
+      <div class="brand"><span class="brand-mark" aria-hidden="true">F</span>FlashPort</div>
+      <div class="connection"><span class="dot"></span><span id="connection-label">Connected</span></div>
+    </header>
+
+    <h1>Send files, simply.</h1>
+    <p class="intro">Choose a file, select who should receive it, and track delivery.</p>
+
+    <section class="panel" aria-labelledby="receive-heading">
+      <div class="panel-heading">
+        <h2 id="receive-heading">Receive on this device</h2>
+        <span class="subtle" id="receiver-state">Not registered</span>
+      </div>
+      <div class="receiver-controls" id="receiver-register">
+        <input id="receiver-name" type="text" maxlength="80" placeholder="Give this device a name" aria-label="Receiver name">
+        <button id="register-button" class="button secondary small" type="button">Register device</button>
+      </div>
+      <div class="receiver-active" id="receiver-active" hidden>
+        <strong id="active-receiver-name"></strong>
+        <button id="unregister-button" class="button secondary small" type="button">Stop receiving</button>
+      </div>
+      <p class="message" id="receiver-message" role="status"></p>
+    </section>
+
+    <section class="panel" aria-labelledby="send-heading">
+      <div class="panel-heading">
+        <h2 id="send-heading">Send a file</h2>
+        <span class="subtle">Up to 1 GB</span>
+      </div>
+      <input id="file-input" type="file" hidden>
+      <div class="drop-zone" id="drop-zone" role="button" tabindex="0" aria-label="Choose a file or drop it here">
+        <div>
+          <div class="upload-icon" aria-hidden="true">↑</div>
+          <p class="drop-title">Drop a file here</p>
+          <div class="drop-help">or <label class="browse" for="file-input">browse your device</label></div>
+        </div>
+      </div>
+      <div class="selected-file" id="selected-file" hidden>
+        <span class="file-title" id="selected-name"></span>
+        <span class="file-size" id="selected-size"></span>
+      </div>
+
+      <div class="panel-heading" style="margin:22px 0 10px">
+        <h2>Choose receivers</h2>
+        <button class="button secondary small" id="refresh-receivers" type="button">Refresh</button>
+      </div>
+      <div class="receiver-list" id="receiver-list"><div class="empty">Looking for available receivers…</div></div>
+      <div class="send-row">
+        <span class="send-help" id="send-help">Select a file and at least one receiver.</span>
+        <button class="button send" id="send-button" type="button" disabled>Send file</button>
+      </div>
+      <p class="message" id="send-message" role="status"></p>
+    </section>
+
+    <section class="panel" aria-labelledby="transfer-heading">
+      <div class="panel-heading">
+        <h2 id="transfer-heading">Transfers</h2>
+        <span class="subtle">Live status for each receiver</span>
+      </div>
+      <div id="transfers"><div class="empty">Your sent files will appear here.</div></div>
+    </section>
+
+    <section class="panel" id="incoming-panel" aria-labelledby="incoming-heading" hidden>
+      <div class="panel-heading">
+        <h2 id="incoming-heading">Incoming files</h2>
+        <span class="subtle">Keep this page open to receive</span>
+      </div>
+      <div id="incoming-list"><div class="empty">Waiting for files…</div></div>
+    </section>
+  </main>
+
+  <script>
+    const $ = selector => document.querySelector(selector);
+    const formatBytes = value => {
+      if (!value) return "0 B";
+      const units = ["B", "KB", "MB", "GB"];
+      const index = Math.min(Math.floor(Math.log(value) / Math.log(1024)), units.length - 1);
+      return `${(value / 1024 ** index).toFixed(index ? 1 : 0)} ${units[index]}`;
+    };
+    const stateLabels = {
+      queued: "Waiting",
+      active: "Sending",
+      paused: "Paused",
+      completed: "Delivered",
+      cancelled: "Cancelled"
+    };
+    const receiverStorageKey = "flashport.receiver";
+    let selectedFile = null;
+    let receivers = [];
+    let receiverIdentity = null;
+    const seenJobs = new Set();
+    const deliveryElements = new Map();
+    const deliveryPolls = new Set();
+
+    async function api(path, options = {}) {
+      const response = await fetch(path, options);
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.detail || `Request failed (${response.status}).`);
+      return data;
+    }
+
+    async function receiverApi(path, options = {}) {
+      const headers = new Headers(options.headers || {});
+      headers.set("X-FlashPort-Receiver-Token", receiverIdentity.token);
+      return api(path, { ...options, headers });
+    }
+
+    function setMessage(element, message, isError = false) {
+      element.textContent = message;
+      element.classList.toggle("error", isError);
+    }
+
+    function updateSendButton() {
+      const selected = document.querySelectorAll("#receiver-list input:checked").length;
+      $("#send-button").disabled = !selectedFile || !selected || $("#send-button").dataset.busy === "true";
+      $("#send-help").textContent = selected
+        ? `${selected} receiver${selected === 1 ? "" : "s"} selected`
+        : "Select a file and at least one receiver.";
+    }
+
+    function chooseFile(file) {
+      if (!file) return;
+      selectedFile = file;
+      $("#selected-name").textContent = file.name;
+      $("#selected-size").textContent = formatBytes(file.size);
+      $("#selected-file").hidden = false;
+      setMessage($("#send-message"), "");
+      updateSendButton();
+    }
+
+    function renderReceivers() {
+      const list = $("#receiver-list");
+      const selected = new Set(
+        [...list.querySelectorAll("input:checked")].map(input => input.value)
+      );
+      list.replaceChildren();
+      if (!receivers.length) {
+        const empty = document.createElement("div");
+        empty.className = "empty";
+        empty.textContent = "No receivers online. Register another device and keep FlashPort open.";
+        list.append(empty);
+        updateSendButton();
+        return;
+      }
+      for (const receiver of receivers) {
+        const label = document.createElement("label");
+        label.className = "receiver-option";
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.value = receiver.receiver_id;
+        checkbox.checked = selected.has(receiver.receiver_id);
+        checkbox.addEventListener("change", updateSendButton);
+        const name = document.createElement("span");
+        name.className = "receiver-name";
+        name.textContent = receiver.name;
+        const online = document.createElement("span");
+        online.className = "online";
+        online.textContent = "Online";
+        label.append(checkbox, name, online);
+        list.append(label);
+      }
+      updateSendButton();
+    }
+
+    async function refreshReceivers() {
+      try {
+        receivers = await api("/api/receivers");
+        renderReceivers();
+        $("#connection-label").textContent = "Connected";
+      } catch (error) {
+        $("#connection-label").textContent = "Reconnecting";
+        setMessage($("#send-message"), error.message, true);
+      }
+    }
+
+    function createDeliveryElement(delivery) {
+      const card = document.createElement("div");
+      card.className = "delivery";
+      const file = document.createElement("div");
+      file.className = "delivery-file";
+      file.textContent = `${delivery.filename} · ${formatBytes(delivery.size)}`;
+      card.append(file);
+      const rows = new Map();
+      for (const receiver of delivery.receivers) {
+        const row = document.createElement("div");
+        row.className = "delivery-row";
+        const name = document.createElement("span");
+        name.className = "delivery-recipient";
+        name.textContent = receiver.name;
+        const track = document.createElement("div");
+        track.className = "progress-track";
+        const fill = document.createElement("div");
+        fill.className = "progress-fill";
+        track.append(fill);
+        const status = document.createElement("span");
+        status.className = "transfer-state";
+        status.textContent = "Waiting";
+        row.append(name, track, status);
+        card.append(row);
+        rows.set(receiver.receiver_id, { fill, status });
+      }
+      $("#transfers").querySelector(".empty")?.remove();
+      $("#transfers").prepend(card);
+      deliveryElements.set(delivery.delivery_id, rows);
+    }
+
+    async function refreshDelivery(deliveryId) {
+      try {
+        const delivery = await api(`/api/deliveries/${encodeURIComponent(deliveryId)}`);
+        const rows = deliveryElements.get(deliveryId);
+        for (const receiver of delivery.receivers) {
+          const row = rows?.get(receiver.receiver_id);
+          if (!row) continue;
+          row.fill.style.width = `${Math.max(0, Math.min(100, receiver.progress))}%`;
+          row.status.textContent = receiver.state === "completed"
+            ? "Delivered"
+            : `${stateLabels[receiver.state] || receiver.state} · ${Math.floor(receiver.progress)}%`;
+          row.status.classList.toggle("done", receiver.state === "completed");
+        }
+        if (delivery.receivers.every(receiver => ["completed", "cancelled"].includes(receiver.state))) {
+          deliveryPolls.delete(deliveryId);
+        }
+      } catch (error) {
+        setMessage($("#send-message"), error.message, true);
+      }
+    }
+
+    async function sendFile() {
+      if (!selectedFile) return;
+      const receiverIds = [...document.querySelectorAll("#receiver-list input:checked")]
+        .map(input => input.value);
+      if (!receiverIds.length) return;
+      const button = $("#send-button");
+      button.dataset.busy = "true";
+      button.disabled = true;
+      button.textContent = "Uploading…";
+      try {
+        const uploaded = await api(`/api/uploads?filename=${encodeURIComponent(selectedFile.name)}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/octet-stream" },
+          body: selectedFile
+        });
+        setMessage($("#send-message"), "File uploaded. Starting delivery…");
+        const delivery = await api("/api/deliveries", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ upload_id: uploaded.upload_id, receiver_ids: receiverIds })
+        });
+        createDeliveryElement(delivery);
+        deliveryPolls.add(delivery.delivery_id);
+        await refreshDelivery(delivery.delivery_id);
+        setMessage($("#send-message"), `Sending ${delivery.filename} to ${delivery.receivers.length} receiver${delivery.receivers.length === 1 ? "" : "s"}.`);
+        selectedFile = null;
+        $("#file-input").value = "";
+        $("#selected-file").hidden = true;
+      } catch (error) {
+        setMessage($("#send-message"), error.message, true);
+      } finally {
+        button.dataset.busy = "false";
+        button.textContent = "Send file";
+        updateSendButton();
+      }
+    }
+
+    async function setReceiverRegistered(identity) {
+      receiverIdentity = identity;
+      localStorage.setItem(receiverStorageKey, JSON.stringify(identity));
+      $("#receiver-register").hidden = true;
+      $("#receiver-active").hidden = false;
+      $("#active-receiver-name").textContent = `${identity.name} is ready to receive`;
+      $("#receiver-state").textContent = "Available";
+      $("#incoming-panel").hidden = false;
+      setMessage($("#receiver-message"), "This page must stay open to receive files.");
+      await pollReceiverJobs();
+    }
+
+    async function registerReceiver() {
+      const name = $("#receiver-name").value.trim();
+      if (!name) {
+        setMessage($("#receiver-message"), "Enter a name for this device.", true);
+        return;
+      }
+      $("#register-button").disabled = true;
+      try {
+        const identity = await api("/api/receivers", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name })
+        });
+        await setReceiverRegistered(identity);
+      } catch (error) {
+        setMessage($("#receiver-message"), error.message, true);
+      } finally {
+        $("#register-button").disabled = false;
+      }
+    }
+
+    async function unregisterReceiver() {
+      if (!receiverIdentity) return;
+      try {
+        await receiverApi(`/api/receivers/${encodeURIComponent(receiverIdentity.receiver_id)}`, {
+          method: "DELETE"
+        });
+      } catch (error) {
+        setMessage($("#receiver-message"), error.message, true);
+      }
+      localStorage.removeItem(receiverStorageKey);
+      receiverIdentity = null;
+      $("#receiver-register").hidden = false;
+      $("#receiver-active").hidden = true;
+      $("#receiver-state").textContent = "Not registered";
+      $("#incoming-panel").hidden = true;
+      setMessage($("#receiver-message"), "This device is no longer available.");
+      await refreshReceivers();
+    }
+
+    function addIncomingItem(job) {
+      const list = $("#incoming-list");
+      list.querySelector(".empty")?.remove();
+      const item = document.createElement("div");
+      item.className = "receive-job";
+      item.id = `incoming-${job.delivery_id}`;
+      const title = document.createElement("div");
+      title.className = "receive-job-title";
+      title.textContent = job.filename;
+      const status = document.createElement("div");
+      status.className = "receive-job-status";
+      status.textContent = `Receiving · 0% of ${formatBytes(job.size)}`;
+      item.append(title, status);
+      list.prepend(item);
+      return status;
+    }
+
+    async function updateReceiverProgress(job, downloaded, started) {
+      const elapsed = Math.max((performance.now() - started) / 1000, 0.001);
+      await api(`/api/transfers/${encodeURIComponent(job.transfer_id)}/progress`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "X-FlashPort-Token": job.token
+        },
+        body: JSON.stringify({
+          downloaded_bytes: downloaded,
+          goodput_bps: downloaded / elapsed
+        })
+      });
+    }
+
+    function sha256Fallback(bytes) {
+      const constants = new Uint32Array([
+        0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
+        0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
+        0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
+        0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967,
+        0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85,
+        0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070,
+        0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
+        0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2
+      ]);
+      const hash = new Uint32Array([
+        0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a,
+        0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19
+      ]);
+      const bitLength = BigInt(bytes.length) * 8n;
+      const paddedLength = Math.ceil((bytes.length + 9) / 64) * 64;
+      const padded = new Uint8Array(paddedLength);
+      padded.set(bytes);
+      padded[bytes.length] = 0x80;
+      new DataView(padded.buffer).setBigUint64(paddedLength - 8, bitLength, false);
+      const words = new Uint32Array(64);
+      const rotateRight = (value, count) => (value >>> count) | (value << (32 - count));
+      const view = new DataView(padded.buffer);
+
+      for (let offset = 0; offset < padded.length; offset += 64) {
+        for (let index = 0; index < 16; index++) words[index] = view.getUint32(offset + index * 4);
+        for (let index = 16; index < 64; index++) {
+          const x = words[index - 15], y = words[index - 2];
+          const s0 = rotateRight(x, 7) ^ rotateRight(x, 18) ^ (x >>> 3);
+          const s1 = rotateRight(y, 17) ^ rotateRight(y, 19) ^ (y >>> 10);
+          words[index] = (words[index - 16] + s0 + words[index - 7] + s1) >>> 0;
+        }
+        let [a, b, c, d, e, f, g, h] = hash;
+        for (let index = 0; index < 64; index++) {
+          const sum1 = rotateRight(e, 6) ^ rotateRight(e, 11) ^ rotateRight(e, 25);
+          const choice = (e & f) ^ (~e & g);
+          const temp1 = (h + sum1 + choice + constants[index] + words[index]) >>> 0;
+          const sum0 = rotateRight(a, 2) ^ rotateRight(a, 13) ^ rotateRight(a, 22);
+          const majority = (a & b) ^ (a & c) ^ (b & c);
+          const temp2 = (sum0 + majority) >>> 0;
+          h = g; g = f; f = e; e = (d + temp1) >>> 0;
+          d = c; c = b; b = a; a = (temp1 + temp2) >>> 0;
+        }
+        hash[0] = (hash[0] + a) >>> 0; hash[1] = (hash[1] + b) >>> 0;
+        hash[2] = (hash[2] + c) >>> 0; hash[3] = (hash[3] + d) >>> 0;
+        hash[4] = (hash[4] + e) >>> 0; hash[5] = (hash[5] + f) >>> 0;
+        hash[6] = (hash[6] + g) >>> 0; hash[7] = (hash[7] + h) >>> 0;
+      }
+      return [...hash].map(word => word.toString(16).padStart(8, "0")).join("");
+    }
+
+    async function fileSha256(blob) {
+      const buffer = await blob.arrayBuffer();
+      if (globalThis.crypto?.subtle) {
+        const digest = new Uint8Array(await globalThis.crypto.subtle.digest("SHA-256", buffer));
+        return [...digest].map(byte => byte.toString(16).padStart(2, "0")).join("");
+      }
+      return sha256Fallback(new Uint8Array(buffer));
+    }
+
+    async function receiveJob(job) {
+      const status = addIncomingItem(job);
+      const started = performance.now();
+      try {
+        const response = await fetch(`/api/transfers/${encodeURIComponent(job.transfer_id)}/content`, {
+          headers: { "X-FlashPort-Token": job.token }
+        });
+        if (!response.ok) {
+          const error = await response.json().catch(() => ({}));
+          throw new Error(error.detail || `Download failed (${response.status}).`);
+        }
+        const reader = response.body.getReader();
+        const parts = [];
+        let downloaded = 0;
+        let lastReported = 0;
+        while (true) {
+          const result = await reader.read();
+          if (result.done) break;
+          parts.push(result.value);
+          downloaded += result.value.byteLength;
+          status.textContent = `Receiving · ${Math.floor(job.size ? downloaded / job.size * 100 : 100)}% of ${formatBytes(job.size)}`;
+          if (downloaded - lastReported >= 256 * 1024 || downloaded === job.size) {
+            await updateReceiverProgress(job, downloaded, started);
+            lastReported = downloaded;
+          }
+        }
+        if (downloaded !== job.size) throw new Error("The received file size did not match.");
+        await updateReceiverProgress(job, downloaded, started);
+        const blob = new Blob(parts, { type: "application/octet-stream" });
+        const sha256 = await fileSha256(blob);
+        await api(`/api/transfers/${encodeURIComponent(job.transfer_id)}/complete`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-FlashPort-Token": job.token
+          },
+          body: JSON.stringify({ sha256 })
+        });
+        const link = document.createElement("a");
+        const objectUrl = URL.createObjectURL(blob);
+        link.href = objectUrl;
+        link.download = job.filename;
+        link.click();
+        setTimeout(() => URL.revokeObjectURL(objectUrl), 30000);
+        status.textContent = `Received and verified · ${formatBytes(job.size)}`;
+        status.style.color = "var(--green)";
+      } catch (error) {
+        status.textContent = `Could not receive file: ${error.message}`;
+        status.style.color = "var(--red)";
+      }
+    }
+
+    async function pollReceiverJobs() {
+      if (!receiverIdentity) return;
+      try {
+        const jobs = await receiverApi(
+          `/api/receivers/${encodeURIComponent(receiverIdentity.receiver_id)}/deliveries`
+        );
+        for (const job of jobs) {
+          if (seenJobs.has(job.delivery_id)) continue;
+          seenJobs.add(job.delivery_id);
+          receiveJob(job);
+        }
+      } catch (error) {
+        setMessage($("#receiver-message"), `Receiver connection lost: ${error.message}`, true);
+      }
+    }
+
+    async function heartbeat() {
+      if (!receiverIdentity) return;
+      try {
+        await receiverApi(`/api/receivers/${encodeURIComponent(receiverIdentity.receiver_id)}/heartbeat`, {
+          method: "PUT"
+        });
+        setMessage($("#receiver-message"), "This page must stay open to receive files.");
+      } catch (error) {
+        setMessage($("#receiver-message"), `Receiver connection lost: ${error.message}`, true);
+      }
+    }
+
+    async function restoreReceiver() {
+      let saved;
+      try {
+        saved = JSON.parse(localStorage.getItem(receiverStorageKey) || "null");
+      } catch {
+        localStorage.removeItem(receiverStorageKey);
+      }
+      if (!saved?.receiver_id || !saved?.token || !saved?.name) return;
+      receiverIdentity = saved;
+      try {
+        await receiverApi(`/api/receivers/${encodeURIComponent(saved.receiver_id)}/heartbeat`, { method: "PUT" });
+        await setReceiverRegistered(saved);
+      } catch {
+        receiverIdentity = null;
+        localStorage.removeItem(receiverStorageKey);
+      }
+    }
+
+    const fileInput = $("#file-input");
+    const dropZone = $("#drop-zone");
+    fileInput.addEventListener("change", () => chooseFile(fileInput.files[0]));
+    dropZone.addEventListener("click", event => {
+      if (event.target.closest("label")) return;
+      fileInput.click();
+    });
+    dropZone.addEventListener("keydown", event => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        fileInput.click();
+      }
+    });
+    for (const eventName of ["dragenter", "dragover"]) {
+      dropZone.addEventListener(eventName, event => {
+        event.preventDefault();
+        dropZone.classList.add("dragging");
+      });
+    }
+    for (const eventName of ["dragleave", "drop"]) {
+      dropZone.addEventListener(eventName, event => {
+        event.preventDefault();
+        dropZone.classList.remove("dragging");
+      });
+    }
+    dropZone.addEventListener("drop", event => chooseFile(event.dataTransfer.files[0]));
+    $("#send-button").addEventListener("click", sendFile);
+    $("#register-button").addEventListener("click", registerReceiver);
+    $("#unregister-button").addEventListener("click", unregisterReceiver);
+    $("#refresh-receivers").addEventListener("click", refreshReceivers);
+
+    refreshReceivers();
+    restoreReceiver();
+    setInterval(refreshReceivers, 3000);
+    setInterval(heartbeat, 5000);
+    setInterval(pollReceiverJobs, 1500);
+    setInterval(() => {
+      for (const deliveryId of deliveryPolls) refreshDelivery(deliveryId);
+    }, 1000);
+  </script>
+</body>
+</html>
