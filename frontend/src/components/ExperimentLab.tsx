@@ -6,20 +6,22 @@ import type { ExperimentBundle, PolicyName, ScenarioInfo } from "../types";
 const POLICY_ORDER: PolicyName[] = ["independent", "max_min", "srpt", "flowweave"];
 const POLICY_LABELS: Record<PolicyName, string> = {
   independent: "Independent",
-  max_min: "Max-Min Fair",
+  max_min: "Max-Min",
   srpt: "SRPT",
   flowweave: "FlowWeave",
 };
+
+// Strict duocolour palette (monochrome ink steps + emerald accent for FlowWeave)
 const POLICY_COLORS: Record<PolicyName, string> = {
-  independent: "#94a3b8",
-  max_min: "#3b82f6",
-  srpt: "#f59e0b",
+  independent: "#52525b",
+  max_min: "#71717a",
+  srpt: "#e4e4e7",
   flowweave: "#10b981",
 };
 
 export const ExperimentLab: React.FC = () => {
   const [scenarios, setScenarios] = useState<ScenarioInfo[]>([]);
-  const [selected, setSelected] = useState("mixed_shared_bottleneck");
+  const [selected, setSelected] = useState("bidirectional_mixed");
   const [seed, setSeed] = useState(42);
   const [bundle, setBundle] = useState<ExperimentBundle | null>(null);
   const [loading, setLoading] = useState(false);
@@ -40,8 +42,7 @@ export const ExperimentLab: React.FC = () => {
     setLoading(true);
     setErr(null);
     try {
-      const res = await runExperiment(selected, seed);
-      setBundle(res);
+      setBundle(await runExperiment(selected, seed));
     } catch (e) {
       setErr(String(e));
     } finally {
@@ -49,69 +50,15 @@ export const ExperimentLab: React.FC = () => {
     }
   }
 
-  const fctChartData = bundle
-    ? {
-        labels: POLICY_ORDER.map((p) => POLICY_LABELS[p]),
-        datasets: [
-          {
-            label: "Sum FCT Σ T_i (s) — lower is better",
-            data: POLICY_ORDER.map((p) => bundle.policies[p].sum_fct_s),
-            backgroundColor: POLICY_ORDER.map((p) => POLICY_COLORS[p]),
-          },
-        ],
-      }
-    : null;
-
-  const fairnessChartData = bundle
-    ? {
-        labels: POLICY_ORDER.map((p) => POLICY_LABELS[p]),
-        datasets: [
-          {
-            label: "Jain's Fairness Index (0–1)",
-            data: POLICY_ORDER.map((p) => bundle.policies[p].jains_fairness),
-            backgroundColor: "#3b82f6",
-          },
-          {
-            label: "Avg FCT (s)",
-            data: POLICY_ORDER.map((p) => bundle.policies[p].avg_fct_s),
-            backgroundColor: "#f59e0b",
-          },
-        ],
-      }
-    : null;
-
-  const timelineChartData = bundle
-    ? (() => {
-        const longest = POLICY_ORDER.reduce((best, p) => {
-          const tl = bundle.timelines[p] ?? [];
-          return tl.length > best.length ? tl : best;
-        }, [] as Array<{ time_s: number; aggregate_goodput_bps: number }>);
-        return {
-          labels: longest.map((pt) => `${pt.time_s.toFixed(1)}s`),
-          datasets: POLICY_ORDER.map((p) => ({
-            label: POLICY_LABELS[p],
-            data: (bundle.timelines[p] ?? []).map((pt) =>
-              Number((pt.aggregate_goodput_bps / (1024 * 1024)).toFixed(2))
-            ),
-            borderColor: POLICY_COLORS[p],
-            backgroundColor: "transparent",
-            pointRadius: 0,
-            tension: 0.2,
-          })),
-        };
-      })()
-    : null;
-
   return (
     <div>
-      {err && <div className="error-banner">{err}</div>}
-
+      {err && <div className="banner banner-error">{err}</div>}
       <div className="card">
-        <h2>
-          <span>Simulation Benchmark & Policy Comparison</span>
-          <span className="badge badge-sim">Simulated Fluid-Flow Model (Not Live Hardware)</span>
-        </h2>
-        <div className="controls-row">
+        <div className="card-head">
+          <h2 className="card-title">Controlled Fluid-Flow Simulator</h2>
+          <span className="badge">Simulated Topology Comparison</span>
+        </div>
+        <div className="row">
           <select value={selected} onChange={(e) => setSelected(e.target.value)}>
             {scenarios.map((sc) => (
               <option key={sc.name} value={sc.name}>
@@ -119,21 +66,18 @@ export const ExperimentLab: React.FC = () => {
               </option>
             ))}
           </select>
-          <label style={{ fontSize: "0.84rem", color: "#94a3b8" }}>
-            Seed:{" "}
-            <input
-              type="number"
-              value={seed}
-              style={{ width: 80 }}
-              onChange={(e) => setSeed(Number(e.target.value))}
-            />
-          </label>
+          <input
+            type="number"
+            value={seed}
+            style={{ width: 84 }}
+            onChange={(e) => setSeed(Number(e.target.value))}
+          />
           <button className="btn" disabled={loading} onClick={handleRun}>
-            {loading ? "Running Simulation..." : "Run 4-Policy Comparison"}
+            {loading ? "Running..." : "Run 4-Policy Comparison"}
           </button>
         </div>
         {scenarios.find((s) => s.name === selected) && (
-          <p style={{ color: "#94a3b8", fontSize: "0.86rem", margin: "10px 0 0" }}>
+          <p className="muted" style={{ margin: "10px 0 0" }}>
             {scenarios.find((s) => s.name === selected)?.description}
           </p>
         )}
@@ -143,68 +87,74 @@ export const ExperimentLab: React.FC = () => {
         <>
           <div className="grid-2">
             <div className="card" style={{ marginBottom: 0 }}>
-              <h2>Total Completion-Time Sum (Σ T_i)</h2>
+              <div className="card-head">
+                <h2 className="card-title">Total Completion Time Sum (Σ T_i)</h2>
+                <span className="muted">Lower is better</span>
+              </div>
               <div className="chart-box">
-                {fctChartData && (
-                  <Bar
-                    data={fctChartData}
-                    options={{
-                      responsive: true,
-                      maintainAspectRatio: false,
-                      plugins: { legend: { labels: { color: "#cbd5e1" } } },
-                      scales: {
-                        x: { ticks: { color: "#94a3b8" }, grid: { color: "#1e293b" } },
-                        y: { beginAtZero: true, ticks: { color: "#94a3b8" }, grid: { color: "#1e293b" } },
+                <Bar
+                  data={{
+                    labels: POLICY_ORDER.map((p) => POLICY_LABELS[p]),
+                    datasets: [
+                      {
+                        label: "Sum FCT (s)",
+                        data: POLICY_ORDER.map((p) => bundle.policies[p].sum_fct_s),
+                        backgroundColor: POLICY_ORDER.map((p) => POLICY_COLORS[p]),
+                        borderRadius: 6,
                       },
-                    }}
-                  />
-                )}
+                    ],
+                  }}
+                  options={{
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                      x: { ticks: { color: "#9ca3af" }, grid: { display: false } },
+                      y: { beginAtZero: true, ticks: { color: "#9ca3af" }, grid: { color: "#27272a" } },
+                    },
+                  }}
+                />
               </div>
             </div>
 
             <div className="card" style={{ marginBottom: 0 }}>
-              <h2>Average FCT vs Jain's Fairness Index</h2>
+              <div className="card-head">
+                <h2 className="card-title">Aggregate Goodput Over Time</h2>
+                <span className="muted">MB/s</span>
+              </div>
               <div className="chart-box">
-                {fairnessChartData && (
-                  <Bar
-                    data={fairnessChartData}
-                    options={{
-                      responsive: true,
-                      maintainAspectRatio: false,
-                      plugins: { legend: { labels: { color: "#cbd5e1" } } },
-                      scales: {
-                        x: { ticks: { color: "#94a3b8" }, grid: { color: "#1e293b" } },
-                        y: { beginAtZero: true, ticks: { color: "#94a3b8" }, grid: { color: "#1e293b" } },
-                      },
-                    }}
-                  />
-                )}
+                <Line
+                  data={{
+                    labels: (bundle.timelines.flowweave ?? []).map((pt) => `${pt.time_s.toFixed(1)}s`),
+                    datasets: POLICY_ORDER.map((p) => ({
+                      label: POLICY_LABELS[p],
+                      data: (bundle.timelines[p] ?? []).map((pt) =>
+                        Number((pt.aggregate_goodput_bps / (1024 * 1024)).toFixed(2))
+                      ),
+                      borderColor: POLICY_COLORS[p],
+                      borderWidth: p === "flowweave" ? 2.5 : 1.6,
+                      pointRadius: 0,
+                      tension: 0.2,
+                    })),
+                  }}
+                  options={{
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { labels: { color: "#d4d4d8" } } },
+                    scales: {
+                      x: { ticks: { color: "#9ca3af", maxTicksLimit: 10 }, grid: { display: false } },
+                      y: { beginAtZero: true, ticks: { color: "#9ca3af" }, grid: { color: "#27272a" } },
+                    },
+                  }}
+                />
               </div>
             </div>
           </div>
 
           <div className="card">
-            <h2>Aggregate Goodput Timeline (MB/s)</h2>
-            <div className="chart-box">
-              {timelineChartData && (
-                <Line
-                  data={timelineChartData}
-                  options={{
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { labels: { color: "#cbd5e1" } } },
-                    scales: {
-                      x: { ticks: { color: "#94a3b8", maxTicksLimit: 12 }, grid: { color: "#1e293b" } },
-                      y: { beginAtZero: true, ticks: { color: "#94a3b8" }, grid: { color: "#1e293b" } },
-                    },
-                  }}
-                />
-              )}
+            <div className="card-head">
+              <h2 className="card-title">Simulated Metrics — {bundle.scenario}</h2>
             </div>
-          </div>
-
-          <div className="card">
-            <h2>Full Evaluation Metrics — {bundle.scenario}</h2>
             <div style={{ overflowX: "auto" }}>
               <table>
                 <thead>
@@ -217,8 +167,7 @@ export const ExperimentLab: React.FC = () => {
                     <th>Goodput (MB/s)</th>
                     <th>Jain Fairness</th>
                     <th>Redundant KB</th>
-                    <th>Sched Avg (ms)</th>
-                    <th>Replicas Won</th>
+                    <th>Sched (ms)</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -227,7 +176,9 @@ export const ExperimentLab: React.FC = () => {
                     return (
                       <tr key={p}>
                         <td>
-                          <strong style={{ color: POLICY_COLORS[p] }}>{POLICY_LABELS[p]}</strong>
+                          <strong style={{ color: p === "flowweave" ? "#34d399" : "#f4f4f5" }}>
+                            {POLICY_LABELS[p]}
+                          </strong>
                         </td>
                         <td>{m.sum_fct_s.toFixed(2)}</td>
                         <td>{m.avg_fct_s.toFixed(2)}</td>
@@ -237,9 +188,6 @@ export const ExperimentLab: React.FC = () => {
                         <td>{m.jains_fairness.toFixed(3)}</td>
                         <td>{(m.redundant_bytes / 1024).toFixed(1)}</td>
                         <td>{m.scheduler_overhead_ms_avg.toFixed(4)}</td>
-                        <td>
-                          {m.replications_won}/{m.replications_triggered}
-                        </td>
                       </tr>
                     );
                   })}

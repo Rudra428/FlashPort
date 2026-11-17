@@ -63,8 +63,14 @@ def test_api_endpoints_end_to_end(tmp_path) -> None:
         )
         assert r.status_code == 200
         exp = r.json()
-        assert set(exp["policies"].keys()) == {"independent", "max_min", "srpt", "flowweave"}
-        assert exp["policies"]["flowweave"]["sum_fct_s"] < exp["policies"]["max_min"]["sum_fct_s"]
+        assert set(exp["policies"].keys()) == {
+            "independent",
+            "max_min",
+            "srpt",
+            "flowweave",
+        }
+        assert exp["policies"]["flowweave"]["makespan_s"] <= exp["policies"]["independent"]["makespan_s"]
+        assert exp["policies"]["flowweave"]["aggregate_goodput_bps"] >= exp["policies"]["independent"]["aggregate_goodput_bps"]
 
         r = client.get("/api/experiments/results")
         assert r.status_code == 200
@@ -99,3 +105,38 @@ def test_api_endpoints_end_to_end(tmp_path) -> None:
         assert mon["is_simulated"] is False
         assert len(mon["transfers"]) >= 8
         assert len(mon["links"]) >= 2
+
+        # 6. Peer-to-peer host info, remote TCP browse, staging, and SRPT vs FlowWeave run
+        info = client.get("/api/host-info").json()
+        tcp_port = info["tcp_port"]
+        assert tcp_port > 0
+
+        s1 = client.post(
+            "/api/transfers/stage-browser",
+            content=b"X" * (128 * 1024),
+            headers={"X-Filename": "peer_small.bin"},
+        )
+        assert s1.status_code == 201
+        s2 = client.post(
+            "/api/transfers/stage-browser",
+            content=b"Y" * (256 * 1024),
+            headers={"X-Filename": "peer_large.bin"},
+        )
+        assert s2.status_code == 201
+
+        send = client.post(
+            "/api/transfers/send-staged",
+            json={"host": "127.0.0.1", "port": tcp_port, "policy": "flowweave", "link_cap_mbps": 50.0},
+        )
+        assert send.status_code == 201
+        assert send.json()["launched"] == 2
+
+        remote = client.get(f"/api/tcp/remote-files?host=127.0.0.1&port={tcp_port}")
+        assert remote.status_code == 200
+        assert remote.json()["rtt_ms"] >= 0.0
+
+        # 7. Integrated receiver status & port rebind
+        recv = client.get("/api/receiver")
+        assert recv.status_code == 200
+        assert recv.json()["listening"] is True
+        assert recv.json()["tcp_port"] == tcp_port

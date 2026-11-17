@@ -1,17 +1,13 @@
-"""Policy 4: FlowWeave cooperative, congestion-aware bidirectional scheduler.
+"""Policy 4: FlowWeave cooperative placement + convex bandwidth-allocation scheduler.
 
-Combines three well-understood scheduling principles across uploads, downloads, and
-multi-hop directed link graphs:
-1. Cooperative route placement: assigns multi-path transfers largest-first onto the route
-   minimizing marginal increase in total batch completion time sum(T_i), naturally
-   offloading shared bottlenecks onto underutilized links.
-2. Congestion-aware capacity budgeting: scales link budgets by congestion_headroom only
-   when real congestion or elevated packet loss is observed, and respects separate upload
-   (uplink), download (downlink), and shared link constraints independently.
-3. Fairness-guarded urgency-weighted SRPT: reserves a max-min fairness floor on every link
-   so large uploads and downloads never starve, then distributes remaining cooperative
-   capacity in urgency order (remaining work, aging anti-starvation, priority weight),
-   subtracting grants across all hops of each transfer's route and logging rationale.
+Pipeline on every scheduling tick:
+1. Estimate effective link capacities C_eff = C * (1 - p) * h.
+2. Run the cooperative marginal batch-delay route/link placement heuristic (discrete step).
+3. Solve the continuous convex bandwidth-allocation problem min sum(R_i / b_i) subject to
+   shared-link effective capacity constraints and optional minimum fairness floor
+   (analytical KKT closed-form on independent single-hop links; CVXPY + CLARABEL on
+   coupled multi-hop routes).
+4. Validate allocations against link capacities and attach full optimization telemetry.
 """
 
 from __future__ import annotations
@@ -26,10 +22,11 @@ from flowweave.scheduler.base import (
     route_latency_ms,
     valid_routes_for,
 )
+from flowweave.scheduler.optimizer import optimize_allocations
 
 
 class FlowWeaveScheduler(Scheduler):
-    """Cooperative, congestion-aware scheduler minimizing sum(T_i) with fairness guards."""
+    """Cooperative placement paired with convex sum-FCT bandwidth optimization."""
 
     name = PolicyName.FLOWWEAVE
 
@@ -46,8 +43,18 @@ class FlowWeaveScheduler(Scheduler):
                 allocations_bps={},
                 link_assignments={},
                 route_assignments={},
+                notes={
+                    "optimization_status": "empty_no_active_transfers",
+                    "solver_name": "none",
+                    "solve_time_ms": 0.0,
+                    "fairness_fraction": self.config.min_fair_share_fraction,
+                    "predicted_completion_times_s": {},
+                    "effective_capacities_bps": {},
+                    "link_utilization": {},
+                },
             )
 
+        # Step 1: Effective link capacities C_eff = C * (1 - p) * h.
         usable_cap: dict[str, float] = {
             lid: effective_capacity(
                 link,
@@ -55,38 +62,72 @@ class FlowWeaveScheduler(Scheduler):
             )
             for lid, link in state.links.items()
         }
-        wire_budget: dict[str, float] = {
-            lid: link.capacity_bps
-            * (self.config.congestion_headroom if link.is_congested else 1.0)
-            for lid, link in state.links.items()
-        }
 
-        # Step 1: Cooperative route selection minimizing marginal batch sum(T_i).
+        # Step 2: Cooperative discrete route/link placement minimizing marginal batch sum(T_i).
         routes, assignments = self._assign_routes(active, state.links, usable_cap)
 
-        # Step 2: Check whether all routes are single-hop (fast exact per-link path)
-        #         or multi-hop directed graph (general graph path).
-        is_multihop = any(len(r) > 1 for r in routes.values())
-        if not is_multihop:
-            allocations = self._allocate_single_hop(active, routes, state.links, wire_budget, state.now)
-        else:
-            allocations = self._allocate_multihop(active, routes, state.links, wire_budget, state.now)
+        # Step 3: Continuous convex sum-FCT bandwidth allocation on the placed routes.
+        fair_frac = (
+            self.config.min_fair_share_fraction
+            if self.config.min_fair_share_fraction > 0.0
+            else None
+        )
+        opt = optimize_allocations(
+            active,
+            state.links,
+            routes=routes,
+            fairness_fraction=fair_frac,
+            congestion_headroom=self.config.congestion_headroom,
+            allow_striping=False,
+        )
 
+        pred_clean = {
+            tid: (round(val, 4) if val != float("inf") else None)
+            for tid, val in opt.predicted_completion_times_s.items()
+        }
         congested_links = [lid for lid, link in state.links.items() if link.is_congested]
-        rationale = self._build_rationale(active, allocations, congested_links)
+
+        rationale = [
+            (
+                f"Convex allocation ({opt.solver_name}, {opt.status}, {opt.solve_time_ms:.2f} ms) "
+                f"across {len(active)} transfers; predicted ΣT_i = {opt.objective_value_s:.2f}s"
+                if opt.objective_value_s is not None
+                else f"Convex allocation ({opt.solver_name}, {opt.status})"
+            )
+        ]
+        if congested_links:
+            rationale.append(f"Applied congestion headroom backoff on: {', '.join(congested_links)}")
+        if opt.warnings:
+            rationale.extend(opt.warnings)
 
         return ScheduleDecision(
             policy=self.name,
             timestamp=state.now,
-            allocations_bps=allocations,
+            allocations_bps={tid: opt.per_transfer_bps.get(tid, 0.0) for tid in routes},
             link_assignments=assignments,
             route_assignments=routes,
             rationale=rationale,
             notes={
+                "optimization_status": opt.status,
+                "solver_name": opt.solver_name,
+                "solve_time_ms": round(opt.solve_time_ms, 4),
+                "objective_value_s": (
+                    round(opt.objective_value_s, 4) if opt.objective_value_s is not None else None
+                ),
+                "fairness_fraction": fair_frac,
+                "mode": opt.mode,
+                "predicted_completion_times_s": pred_clean,
+                "effective_capacities_bps": {
+                    lid: round(cap, 2) for lid, cap in opt.effective_capacities_bps.items()
+                },
+                "link_utilization": {
+                    lid: round(u, 4) for lid, u in opt.link_utilization.items()
+                },
                 "congested_links": congested_links,
                 "active_transfers": len(active),
                 "uploads": sum(1 for t in active if t.direction.value == "upload"),
                 "downloads": sum(1 for t in active if t.direction.value == "download"),
+                "warnings": list(opt.warnings),
             },
         )
 
@@ -141,170 +182,3 @@ class FlowWeaveScheduler(Scheduler):
         rtt_penalty = route_latency_ms(route, links) / 1000.0
         loss_penalty = sum(links[lid].loss_rate for lid in route) * 2.0
         return max(hop_costs) + rtt_penalty + loss_penalty
-
-    def _urgency_score(self, transfer: TransferSnapshot, now: float) -> float:
-        work_floor = max(float(transfer.remaining_bytes), 65_536.0)
-        wait_s = max(0.0, now - (transfer.started_at if transfer.started_at is not None else transfer.created_at))
-        aging = 1.0 + self.config.starvation_aging_per_s * wait_s
-        return (transfer.priority_weight * aging) / (work_floor ** self.config.srpt_exponent)
-
-    def _allocate_single_hop(
-        self,
-        active: list[TransferSnapshot],
-        routes: dict[str, list[str]],
-        links: dict[str, LinkState],
-        wire_budget: dict[str, float],
-        now: float,
-    ) -> dict[str, float]:
-        per_link: dict[str, list[TransferSnapshot]] = defaultdict(list)
-        for t in active:
-            if t.transfer_id in routes:
-                per_link[routes[t.transfer_id][0]].append(t)
-
-        allocations: dict[str, float] = {}
-        for link_id, group in per_link.items():
-            allocations.update(
-                self._allocate_on_link(group, links[link_id], wire_budget[link_id], now)
-            )
-        return allocations
-
-    def _allocate_on_link(
-        self,
-        group: list[TransferSnapshot],
-        link: LinkState,
-        cap_bps: float,
-        now: float,
-    ) -> dict[str, float]:
-        n = len(group)
-        if n == 1:
-            return {group[0].transfer_id: cap_bps}
-
-        floor_budget = cap_bps * min(max(self.config.min_fair_share_fraction, 0.0), 0.9)
-        base_share = max(min(self.config.min_rate_bps, cap_bps / n), floor_budget / n)
-        allocs: dict[str, float] = {}
-        used = 0.0
-        for t in group:
-            max_useful = max(self.config.min_rate_bps, t.remaining_bytes / self.horizon_s)
-            grant = min(base_share, max_useful)
-            allocs[t.transfer_id] = grant
-            used += grant
-
-        pool = max(0.0, cap_bps - used)
-        if pool <= 1e-6:
-            return allocs
-
-        scores = {t.transfer_id: self._urgency_score(t, now) for t in group}
-        ordered = sorted(group, key=lambda t: (-scores[t.transfer_id], t.remaining_bytes, t.transfer_id))
-
-        waterfall_budget = pool * 0.70
-        proportional_budget = pool - waterfall_budget
-
-        for idx, t in enumerate(ordered):
-            if waterfall_budget <= 1e-6:
-                break
-            max_useful = max(
-                0.0,
-                ((t.remaining_bytes / self.horizon_s) * 1.15) - allocs[t.transfer_id],
-            )
-            grant = waterfall_budget if idx == len(ordered) - 1 else min(waterfall_budget, max_useful)
-            allocs[t.transfer_id] += grant
-            waterfall_budget -= grant
-
-        proportional_budget += waterfall_budget
-        if proportional_budget > 1e-6:
-            total_score = sum(scores.values())
-            for t in ordered:
-                share = (
-                    proportional_budget * (scores[t.transfer_id] / total_score)
-                    if total_score > 0
-                    else proportional_budget / n
-                )
-                allocs[t.transfer_id] += share
-
-        total_alloc = sum(allocs.values())
-        if total_alloc > link.capacity_bps and total_alloc > 0:
-            scale = link.capacity_bps / total_alloc
-            for tid in allocs:
-                allocs[tid] *= scale
-        return allocs
-
-    def _allocate_multihop(
-        self,
-        active: list[TransferSnapshot],
-        routes: dict[str, list[str]],
-        links: dict[str, LinkState],
-        wire_budget: dict[str, float],
-        now: float,
-    ) -> dict[str, float]:
-        """Graph-wide fairness floor + urgency-weighted SRPT respecting every shared hop."""
-        eligible = [t for t in active if t.transfer_id in routes]
-        rem_cap = dict(wire_budget)
-        allocs: dict[str, float] = {t.transfer_id: 0.0 for t in eligible}
-
-        # 1. Fairness floor across every link
-        link_flow_counts: dict[str, int] = defaultdict(int)
-        for t in eligible:
-            for lid in routes[t.transfer_id]:
-                link_flow_counts[lid] += 1
-
-        fair_frac = min(max(self.config.min_fair_share_fraction, 0.0), 0.9)
-        for t in eligible:
-            route = routes[t.transfer_id]
-            floor_rate = min(
-                (wire_budget[lid] * fair_frac) / max(1, link_flow_counts[lid]) for lid in route
-            )
-            grant = min(floor_rate, min(rem_cap[lid] for lid in route))
-            allocs[t.transfer_id] += grant
-            for lid in route:
-                rem_cap[lid] = max(0.0, rem_cap[lid] - grant)
-
-        # 2. Urgency-ordered waterfall over remaining graph capacity
-        scores = {t.transfer_id: self._urgency_score(t, now) for t in eligible}
-        ordered = sorted(eligible, key=lambda t: (-scores[t.transfer_id], t.remaining_bytes, t.transfer_id))
-
-        for idx, t in enumerate(ordered):
-            route = routes[t.transfer_id]
-            avail = min(rem_cap[lid] for lid in route)
-            if avail <= 1e-6:
-                continue
-            needed = max(0.0, (t.remaining_bytes / self.horizon_s) * 1.15 - allocs[t.transfer_id])
-            grant = avail if idx == len(ordered) - 1 else min(avail, needed)
-            allocs[t.transfer_id] += grant
-            for lid in route:
-                rem_cap[lid] = max(0.0, rem_cap[lid] - grant)
-
-        # 3. Spill any leftover capacity proportionally so independent/fast links stay saturated
-        for t in ordered:
-            route = routes[t.transfer_id]
-            avail = min(rem_cap[lid] for lid in route)
-            if avail <= 1e-6:
-                continue
-            allocs[t.transfer_id] += avail
-            for lid in route:
-                rem_cap[lid] = max(0.0, rem_cap[lid] - avail)
-
-        return allocs
-
-    @staticmethod
-    def _build_rationale(
-        active: list[TransferSnapshot],
-        allocations: dict[str, float],
-        congested_links: list[str],
-    ) -> list[str]:
-        reasons: list[str] = []
-        ranked = sorted(active, key=lambda t: -allocations.get(t.transfer_id, 0.0))
-        if ranked:
-            top = ranked[0]
-            rate_mb = allocations.get(top.transfer_id, 0.0) / (1024 * 1024)
-            reasons.append(
-                f"Prioritized {top.direction.value} '{top.filename}' ({top.remaining_bytes / 1024:.0f} KB left) at {rate_mb:.2f} MB/s"
-            )
-        if len(ranked) > 1:
-            low = ranked[-1]
-            low_mb = allocations.get(low.transfer_id, 0.0) / (1024 * 1024)
-            reasons.append(
-                f"Protected '{low.filename}' with fairness floor at {low_mb:.2f} MB/s to prevent starvation"
-            )
-        if congested_links:
-            reasons.append(f"Applied congestion headroom backoff on: {', '.join(congested_links)}")
-        return reasons

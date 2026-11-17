@@ -55,7 +55,7 @@ def test_srpt_prioritizes_shortest_remaining() -> None:
     assert sum(dec.allocations_bps.values()) <= 10_000_000.0 + 1e-3
 
 
-def test_flowweave_prioritizes_short_while_protecting_large_from_starvation() -> None:
+def test_flowweave_convex_allocation_and_fairness_floor() -> None:
     links = {"wan": LinkState("wan", capacity_bps=10_000_000.0)}
     transfers = [
         _make_transfer("small", 1_000_000, ["wan"]),
@@ -66,9 +66,10 @@ def test_flowweave_prioritizes_short_while_protecting_large_from_starvation() ->
     dec = create_scheduler(PolicyName.FLOWWEAVE, config=cfg, horizon_s=0.25).decide(
         SchedulerInput(now=1.0, transfers=transfers, links=links)
     )
-    assert dec.allocations_bps["small"] > dec.allocations_bps["medium"] > dec.allocations_bps["large"]
-    # Fairness floor prevents complete starvation of the largest transfer.
-    assert dec.allocations_bps["large"] >= (10_000_000.0 * 0.15 / 3.0) - 1.0
+    assert dec.notes["optimization_status"] == "optimal_analytical"
+    # Static convex min sum(R_i / b_i) allocates b_i proportional to sqrt(R_i), subject to the fairness floor.
+    assert dec.allocations_bps["large"] > dec.allocations_bps["medium"] > dec.allocations_bps["small"]
+    assert dec.allocations_bps["small"] >= (10_000_000.0 * 0.15 / 3.0) - 1.0
     assert sum(dec.allocations_bps.values()) <= 10_000_000.0 + 1e-3
 
 

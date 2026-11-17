@@ -26,6 +26,7 @@ from flowweave.straggler.detector import ActiveChunkView
 from flowweave.transfer.engine import HTTPDownloadEngine
 from flowweave.transfer.rate_limiter import AsyncRateLimiter
 from flowweave.transfer.security import sanitize_filename
+from flowweave.transfer.tcp_client import TCPDownloadEngine, TCPUploadEngine
 from flowweave.transfer.upload_client import HTTPUploadEngine
 
 
@@ -79,6 +80,8 @@ class TransferManager:
         self.storage = storage
         self.download_engine = HTTPDownloadEngine(self.config)
         self.upload_engine = HTTPUploadEngine(self.config)
+        self.tcp_download_engine = TCPDownloadEngine(self.config)
+        self.tcp_upload_engine = TCPUploadEngine(self.config)
         self._transfers: dict[str, _ManagedTransfer] = {}
         self._session: aiohttp.ClientSession | None = None
 
@@ -248,6 +251,18 @@ class TransferManager:
                 self.storage.upsert_transfer(self._to_snapshot(mt))
         return True
 
+    def clear_finished(self) -> int:
+        """Remove completed, failed, and cancelled transfers from active view."""
+        done_ids = [
+            tid
+            for tid, mt in self._transfers.items()
+            if mt.state in (TransferState.COMPLETED, TransferState.FAILED, TransferState.CANCELLED)
+        ]
+        for tid in done_ids:
+            self._transfers.pop(tid, None)
+            self.monitor.remove_transfer(tid)
+        return len(done_ids)
+
     async def wait_all(self, timeout: float | None = None) -> None:
         tasks = [t.task for t in self._transfers.values() if t.task is not None]
         if tasks:
@@ -362,18 +377,31 @@ class TransferManager:
                 mt.last_rtt_ms = rtt_ms
 
         try:
-            res = await self.download_engine.download(
-                session=self._session,
-                transfer_id=mt.transfer_id,
-                url=mt.url,
-                dest_path=mt.dest_path,
-                rate_limiter=mt.limiter,
-                expected_sha256=mt.expected_sha256,
-                pause_event=mt.pause_event,
-                on_metadata=on_metadata,
-                on_progress=on_progress,
-                chunk_records=mt.chunks,
-            )
+            if mt.url.startswith("tcp://"):
+                res = await self.tcp_download_engine.download(
+                    transfer_id=mt.transfer_id,
+                    url=mt.url,
+                    dest_path=mt.dest_path,
+                    rate_limiter=mt.limiter,
+                    expected_sha256=mt.expected_sha256,
+                    pause_event=mt.pause_event,
+                    on_metadata=on_metadata,
+                    on_progress=on_progress,
+                    chunk_records=mt.chunks,
+                )
+            else:
+                res = await self.download_engine.download(
+                    session=self._session,
+                    transfer_id=mt.transfer_id,
+                    url=mt.url,
+                    dest_path=mt.dest_path,
+                    rate_limiter=mt.limiter,
+                    expected_sha256=mt.expected_sha256,
+                    pause_event=mt.pause_event,
+                    on_metadata=on_metadata,
+                    on_progress=on_progress,
+                    chunk_records=mt.chunks,
+                )
             mt.total_bytes = res.total_bytes
             mt.transferred_bytes = res.total_bytes
             mt.total_chunks = res.total_chunks
@@ -409,18 +437,31 @@ class TransferManager:
                 mt.last_rtt_ms = rtt_ms
 
         try:
-            res = await self.upload_engine.upload(
-                session=self._session,
-                transfer_id=mt.transfer_id,
-                file_path=mt.source_file_path,
-                server_base_url=server_base_url,
-                rate_limiter=mt.limiter,
-                filename=mt.filename,
-                pause_event=mt.pause_event,
-                on_metadata=on_metadata,
-                on_progress=on_progress,
-                chunk_records=mt.chunks,
-            )
+            if server_base_url.startswith("tcp://"):
+                res = await self.tcp_upload_engine.upload(
+                    transfer_id=mt.transfer_id,
+                    file_path=mt.source_file_path,
+                    server_url=server_base_url,
+                    rate_limiter=mt.limiter,
+                    filename=mt.filename,
+                    pause_event=mt.pause_event,
+                    on_metadata=on_metadata,
+                    on_progress=on_progress,
+                    chunk_records=mt.chunks,
+                )
+            else:
+                res = await self.upload_engine.upload(
+                    session=self._session,
+                    transfer_id=mt.transfer_id,
+                    file_path=mt.source_file_path,
+                    server_base_url=server_base_url,
+                    rate_limiter=mt.limiter,
+                    filename=mt.filename,
+                    pause_event=mt.pause_event,
+                    on_metadata=on_metadata,
+                    on_progress=on_progress,
+                    chunk_records=mt.chunks,
+                )
             mt.total_bytes = res.total_bytes
             mt.transferred_bytes = res.total_bytes
             mt.total_chunks = res.total_chunks

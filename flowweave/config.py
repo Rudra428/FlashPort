@@ -53,8 +53,8 @@ class MonitorConfig:
 
 @dataclass
 class TransferConfig:
-    download_dir: Path = field(default_factory=lambda: Path("downloads"))
-    upload_dir: Path = field(default_factory=lambda: Path("uploads"))
+    download_dir: Path = field(default_factory=lambda: Path.home() / "Downloads")
+    upload_dir: Path = field(default_factory=lambda: Path.home() / "Downloads")
     sample_dir: Path = field(default_factory=lambda: Path("sample_files"))
     chunk_size_bytes: int = 256 * 1024  # 256 KiB
     max_chunks_per_transfer: int = 4

@@ -21,7 +21,12 @@ from flowweave.simulator.scenarios import mixed_sizes_shared_bottleneck
 
 def test_run_scenario_comparison_returns_all_four_policies() -> None:
     bundle = run_scenario_comparison(mixed_sizes_shared_bottleneck(seed=123))
-    assert set(bundle.summaries.keys()) == {"independent", "max_min", "srpt", "flowweave"}
+    assert set(bundle.summaries.keys()) == {
+        "independent",
+        "max_min",
+        "srpt",
+        "flowweave",
+    }
     for policy, summary in bundle.summaries.items():
         assert summary.completed_transfers == summary.num_transfers
         assert summary.avg_fct_s > 0

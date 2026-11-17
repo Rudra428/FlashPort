@@ -288,6 +288,50 @@ def uniform_sizes_fairness(seed: int = 42) -> ScenarioSpec:
     )
 
 
+def congested_lossy_links(seed: int = 42) -> ScenarioSpec:
+    """Lossy primary bottleneck paired with a cleaner secondary link exercising C_eff = C*(1-p)*h."""
+    links = [
+        LinkSpec(
+            "lossy-primary",
+            capacity_bps=10 * MB,
+            latency_ms=45.0,
+            loss_rate=0.12,
+            is_shared=True,
+            source_node="cdn-a",
+            target_node="client",
+        ),
+        LinkSpec(
+            "clean-secondary",
+            capacity_bps=6 * MB,
+            latency_ms=20.0,
+            loss_rate=0.005,
+            is_shared=True,
+            source_node="cdn-b",
+            target_node="client",
+        ),
+    ]
+    sizes_mb = [1.0, 2.0, 3.0, 5.0, 8.0, 12.0, 16.0, 20.0]
+    transfers = [
+        TransferSpec(
+            transfer_id=f"tx-{i+1}",
+            filename=f"lossy_{i+1}_{sz}MB.bin",
+            size_bytes=int(sz * MB),
+            arrival_time_s=0.0 if i < 4 else 0.4 * (i - 3),
+            candidate_links=["lossy-primary", "clean-secondary"] if i % 2 == 0 else ["lossy-primary"],
+            chunk_size_bytes=256 * 1024,
+        )
+        for i, sz in enumerate(sizes_mb)
+    ]
+    return ScenarioSpec(
+        name="congested_lossy_links",
+        description="8 transfers over a 12%-loss primary link (10 MB/s) and cleaner 6 MB/s secondary link.",
+        links=links,
+        transfers=transfers,
+        tick_s=0.1,
+        seed=seed,
+    )
+
+
 def get_all_scenarios(seed: int = 42) -> dict[str, ScenarioSpec]:
     """Return the full catalog of built-in evaluation scenarios."""
     specs = [
@@ -297,6 +341,7 @@ def get_all_scenarios(seed: int = 42) -> dict[str, ScenarioSpec]:
         bidirectional_mixed(seed),
         multi_link_offload(seed),
         dynamic_bandwidth_drop(seed),
+        congested_lossy_links(seed),
         straggler_recovery(seed),
         uniform_sizes_fairness(seed),
         high_concurrency_scale(25, seed),

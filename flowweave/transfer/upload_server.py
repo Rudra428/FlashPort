@@ -45,6 +45,19 @@ class ChunkedUploadStore:
         self._by_transfer_id: dict[str, str] = {}
         self._lock = threading.Lock()
 
+    def _unique_target_path(self, safe_filename: str) -> Path:
+        """Pick clean `<filename>` in upload_dir, appending `(1)`, `(2)` if already present."""
+        base = safe_resolve_under(self.upload_dir, safe_filename)
+        if not base.exists():
+            return base
+        stem = base.stem
+        suffix = base.suffix
+        for n in range(1, 10_000):
+            candidate = safe_resolve_under(self.upload_dir, f"{stem}({n}){suffix}")
+            if not candidate.exists():
+                return candidate
+        return safe_resolve_under(self.upload_dir, f"{uuid.uuid4().hex[:6]}_{safe_filename}")
+
     def init_session(
         self,
         *,
@@ -207,9 +220,9 @@ class ChunkedUploadStore:
             expected_chunks = sess.expected_chunks
             total_bytes = sess.total_bytes
             expected_sha = sess.expected_sha256
-            final_name = f"{sess.transfer_id}_{sess.filename}"
+            clean_name = sess.filename
 
-        target_path = safe_resolve_under(self.upload_dir, final_name)
+        target_path = self._unique_target_path(clean_name)
         assembled_tmp = staging_dir / "assembled.tmp"
         hasher = hashlib.sha256()
         written = 0

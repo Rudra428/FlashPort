@@ -121,12 +121,31 @@ def main(argv: list[str] | None = None) -> None:
     p_netem = sub.add_parser("netem-script", help="Generate Linux tc + iperf3 experiment script")
     p_netem.add_argument("--out", default="scripts/run_tc_experiment.sh")
 
+    p_tcp = sub.add_parser("tcp-server", help="Run standalone raw TCP socket server (for LAN/Wi-Fi demos)")
+    p_tcp.add_argument("--host", default="0.0.0.0")
+    p_tcp.add_argument("--port", type=int, default=9000)
+    p_tcp.add_argument("--serve-dir", default="sample_files")
+    p_tcp.add_argument("--upload-dir", default="uploads")
+
     args = parser.parse_args(argv)
 
     if args.command == "serve":
         import uvicorn
 
         uvicorn.run("flowweave.api.app:app", host=args.host, port=args.port, reload=False)
+    elif args.command == "tcp-server":
+        from flowweave.demo import ensure_sample_files
+        from flowweave.transfer.tcp_server import FlowWeaveTCPServer
+
+        ensure_sample_files(args.serve_dir)
+        srv = FlowWeaveTCPServer(
+            host=args.host,
+            port=args.port,
+            serve_dir=args.serve_dir,
+            upload_dir=args.upload_dir,
+        )
+        print(f"Starting FlowWeave raw TCP socket server on {args.host}:{args.port} (serving {args.serve_dir})")
+        asyncio.run(srv.serve_forever())
     elif args.command == "benchmark":
         bundles = run_full_benchmark(
             output_dir=args.out,

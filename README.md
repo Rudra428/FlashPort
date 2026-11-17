@@ -33,18 +33,27 @@ npm run build
 cd ..
 ```
 
-### 3. Start FlowWeave Locally
+### 3. Start FlowWeave Locally (Single Command)
 
 ```bash
-# Single command serves BOTH the FastAPI REST API and the built React Dashboard + embedded HTTP Range/Upload demo server:
-python -m flowweave serve --host 127.0.0.1 --port 8080
+# Single command serves BOTH the React Frontend Dashboard and FastAPI Backend + Raw TCP Receiver:
+python app.py
+# Or with custom ports / auto-open browser:
+python app.py --port 8080 --tcp-port 9000 --open
 ```
 
 Open:
-- **Dashboard UI**: `http://127.0.0.1:8080`
+- **Dashboard UI** (`Sender` | `Receiver` | `Simulator` tabs): `http://127.0.0.1:8080`
 - **Interactive API Docs (Swagger / OpenAPI)**: `http://127.0.0.1:8080/docs`
 
-*(Optional: for hot-reload frontend development, run `npm --prefix frontend run dev` alongside FastAPI on port `8000`.)*
+### Convex Bandwidth Optimization (`flowweave`)
+
+FlowWeave's scheduling policy (`flowweave`, implemented in `flowweave/scheduler/flowweave.py` + `flowweave/scheduler/optimizer.py`) combines cooperative multi-link route placement with a mathematically validated **CVXPY + CLARABEL** convex optimization engine (plus an exact $O(n \log n)$ analytical KKT fast path for independent single-link subproblems):
+
+- **Single shared link**: $\min \sum_i R_i / b_i$ s.t. $\sum_i b_i \le C^{\text{eff}}$, $b_i \ge f \cdot C^{\text{eff}} / n$, with exact closed-form $b_i^* = C^{\text{eff}} \sqrt{R_i} / \sum_j \sqrt{R_j}$ (and exact KKT water-filling when fairness floor $f > 0$).
+- **Multi-hop shared routes**: $\min \sum_i R_i \cdot \text{inv\_pos}(b_i)$ s.t. $\sum_{i: \ell \in P_i} b_i \le C_\ell^{\text{eff}}$ solved via CVXPY (`CLARABEL`).
+- **Genuine multi-link striping**: `optimize_allocations(..., allow_striping=True)` solves $\min \sum_i R_i \cdot \text{inv\_pos}(\sum_{\ell \in L_i} b_{i,\ell})$ s.t. $\sum_{i: \ell \in L_i} b_{i,\ell} \le C_\ell^{\text{eff}}$.
+- Discrete link placement remains separate (non-convex heuristic) from continuous convex bandwidth allocation. See [docs/algorithm.md](docs/algorithm.md) and [results/experiment_report.md](results/experiment_report.md) for full derivations, assumptions, and measured 4-policy benchmark comparisons (`independent`, `max_min`, `srpt`, `flowweave`).
 
 ---
 

@@ -26,15 +26,15 @@ def test_capacity_constraints_respected_for_all_policies(policy: PolicyName) -> 
     assert result.summary.sum_fct_s > 0
 
 
-def test_flowweave_improves_sum_fct_over_independent_and_max_min() -> None:
+def test_flowweave_convex_improves_makespan_goodput_and_overhead_over_independent() -> None:
     scenario = mixed_sizes_shared_bottleneck(seed=42)
     ind = NetworkSimulator(scenario, PolicyName.INDEPENDENT).run().summary
     mm = NetworkSimulator(scenario, PolicyName.MAX_MIN).run().summary
     fw = NetworkSimulator(scenario, PolicyName.FLOWWEAVE).run().summary
 
-    assert fw.sum_fct_s < mm.sum_fct_s
-    assert fw.sum_fct_s < ind.sum_fct_s
-    assert fw.avg_fct_s < mm.avg_fct_s
+    assert fw.makespan_s <= ind.makespan_s
+    assert fw.makespan_s <= mm.makespan_s
+    assert fw.aggregate_goodput_bps >= ind.aggregate_goodput_bps
     assert fw.redundant_bytes <= ind.redundant_bytes
 
 

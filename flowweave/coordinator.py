@@ -258,5 +258,10 @@ class FlowWeaveCoordinator:
             "last_compute_time_ms": (
                 round(self.last_decision.compute_time_ms, 4) if self.last_decision else 0.0
             ),
+            "last_optimization": (
+                dict(self.last_decision.notes)
+                if self.last_decision and "optimization_status" in self.last_decision.notes
+                else None
+            ),
             "history": self.storage.recent_monitor_samples(limit=60),
         }

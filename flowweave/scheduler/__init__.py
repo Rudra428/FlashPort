@@ -8,6 +8,12 @@ from flowweave.scheduler.base import Scheduler
 from flowweave.scheduler.flowweave import FlowWeaveScheduler
 from flowweave.scheduler.independent import IndependentScheduler
 from flowweave.scheduler.max_min import MaxMinFairScheduler
+from flowweave.scheduler.optimizer import (
+    OptimizationResult,
+    TransferLinkAllocation,
+    optimize_allocations,
+    solve_single_link_analytical,
+)
 from flowweave.scheduler.srpt import SRPTScheduler
 
 
@@ -36,5 +42,9 @@ __all__ = [
     "MaxMinFairScheduler",
     "SRPTScheduler",
     "FlowWeaveScheduler",
+    "OptimizationResult",
+    "TransferLinkAllocation",
+    "optimize_allocations",
+    "solve_single_link_analytical",
     "create_scheduler",
 ]

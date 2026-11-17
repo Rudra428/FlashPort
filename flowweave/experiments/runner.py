@@ -21,6 +21,16 @@ ALL_POLICIES: list[PolicyName] = [
 ]
 
 
+def _mean_link_utilization(timeline: list[dict[str, Any]]) -> float:
+    vals = [
+        u
+        for pt in timeline
+        for u in pt.get("link_utilization", {}).values()
+        if isinstance(u, (int, float))
+    ]
+    return float(sum(vals) / len(vals)) if vals else 0.0
+
+
 @dataclass
 class ComparisonBundle:
     scenario: str
@@ -107,6 +117,7 @@ def run_full_benchmark(
         "makespan_s",
         "aggregate_goodput_mbps",
         "jains_fairness",
+        "mean_link_utilization",
         "redundant_bytes",
         "redundant_ratio",
         "scheduler_overhead_ms_avg",
@@ -117,7 +128,7 @@ def run_full_benchmark(
         writer = csv.DictWriter(fh, fieldnames=fieldnames)
         writer.writeheader()
         for bundle in bundles + scale_bundles:
-            for s in bundle.summaries.values():
+            for p_name, s in bundle.summaries.items():
                 writer.writerow(
                     {
                         "scenario": s.scenario,
@@ -130,6 +141,7 @@ def run_full_benchmark(
                         "makespan_s": round(s.makespan_s, 4),
                         "aggregate_goodput_mbps": round(s.aggregate_goodput_bps / (1024 * 1024), 4),
                         "jains_fairness": round(s.jains_fairness, 4),
+                        "mean_link_utilization": round(_mean_link_utilization(bundle.timelines.get(p_name, [])), 4),
                         "redundant_bytes": s.redundant_bytes,
                         "redundant_ratio": round(s.redundant_ratio, 5),
                         "scheduler_overhead_ms_avg": round(s.scheduler_overhead_ms_avg, 4),
@@ -156,7 +168,7 @@ def _write_markdown_report(
     lines = [
         "# FlowWeave Experiment Report",
         "",
-        f"Reproducible simulation benchmark (`seed={seed}`). All four scheduling policies were evaluated under identical topologies, file sizes, arrival schedules, and deterministic link impairment streams.",
+        f"Reproducible simulation benchmark (`seed={seed}`). All {len(ALL_POLICIES)} scheduling policies were evaluated under identical topologies, file sizes, arrival schedules, and deterministic link impairment streams.",
         "",
     ]
     for bundle in bundles:
@@ -165,21 +177,22 @@ def _write_markdown_report(
         lines.append(bundle.description)
         lines.append("")
         lines.append(
-            "| Policy | Sum FCT (s) | Avg FCT (s) | P95 FCT (s) | Makespan (s) | Goodput (MB/s) | Jain Fairness | Redundant KB | Sched Avg (ms) |"
+            "| Policy | Sum FCT (s) | Avg FCT (s) | P95 FCT (s) | Makespan (s) | Goodput (MB/s) | Jain Fairness | Link Util | Redundant KB | Sched Avg (ms) |"
         )
-        lines.append("|---|---:|---:|---:|---:|---:|---:|---:|---:|")
+        lines.append("|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|")
         for p in [pol.value for pol in ALL_POLICIES]:
             s = bundle.summaries[p]
+            util_pct = _mean_link_utilization(bundle.timelines.get(p, [])) * 100.0
             lines.append(
                 f"| `{p}` | {s.sum_fct_s:.2f} | {s.avg_fct_s:.2f} | {s.p95_fct_s:.2f} | "
                 f"{s.makespan_s:.2f} | {s.aggregate_goodput_bps / (1024 * 1024):.2f} | "
-                f"{s.jains_fairness:.3f} | {s.redundant_bytes / 1024:.1f} | {s.scheduler_overhead_ms_avg:.4f} |"
+                f"{s.jains_fairness:.3f} | {util_pct:.1f}% | {s.redundant_bytes / 1024:.1f} | {s.scheduler_overhead_ms_avg:.4f} |"
             )
         lines.append("")
 
     lines.append("## Scalability Sweep (Concurrent Transfers)")
     lines.append("")
-    lines.append("| Transfers | Independent Sum FCT (s) | Max-Min Sum FCT (s) | SRPT Sum FCT (s) | FlowWeave Sum FCT (s) | FlowWeave Sched Avg (ms) |")
+    lines.append("| Transfers | Independent | Max-Min | SRPT | FlowWeave | FlowWeave Sched Avg (ms) |")
     lines.append("|---:|---:|---:|---:|---:|---:|")
     for bundle in scale_bundles:
         n = bundle.summaries["flowweave"].num_transfers
@@ -216,11 +229,11 @@ def _generate_charts(
         "independent": "Independent",
         "max_min": "Max-Min Fair",
         "srpt": "SRPT",
-        "flowweave": "FlowWeave",
+        "flowweave": "FlowWeave (Convex)",
     }
 
     # 1. Sum of Completion Times across scenarios
-    fig, ax = plt.subplots(figsize=(11, 5))
+    fig, ax = plt.subplots(figsize=(12, 5))
     x = np.arange(len(bundles))
     width = 0.2
     for idx, pol in enumerate(policy_order):
@@ -237,7 +250,7 @@ def _generate_charts(
     plt.close(fig)
 
     # 2. Fairness vs Average FCT across scenarios
-    fig, axes = plt.subplots(1, 2, figsize=(12, 4.8))
+    fig, axes = plt.subplots(1, 2, figsize=(12.5, 4.8))
     for idx, pol in enumerate(policy_order):
         avg_fcts = [b.summaries[pol].avg_fct_s for b in bundles]
         fairness = [b.summaries[pol].jains_fairness for b in bundles]
