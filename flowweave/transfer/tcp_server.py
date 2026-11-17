@@ -10,6 +10,7 @@ from __future__ import annotations
 import asyncio
 import hashlib
 import logging
+import os
 import socket
 import time
 from pathlib import Path
@@ -106,7 +107,11 @@ class FlowWeaveTCPServer:
             raise ValueError(f"Invalid TCP port: {port}")
 
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        # On POSIX, SO_REUSEADDR allows rebinding TIME_WAIT sockets cleanly.
+        # On Windows, SO_REUSEADDR allows multiple processes to bind the same port simultaneously
+        # and silently hijack incoming packets, so avoid it on Windows.
+        if os.name != "nt":
+            sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         try:
             sock.bind((self.host, port))
         except OSError as exc:
@@ -270,6 +275,7 @@ class FlowWeaveTCPServer:
         if raw_sock is not None:
             try:
                 raw_sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+                raw_sock.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
             except OSError:
                 pass
 
@@ -380,7 +386,8 @@ class FlowWeaveTCPServer:
 
         if op == "PUT_CHUNK":
             sid = str(header["session_id"])
-            res = self.upload_store.store_chunk(
+            res = await asyncio.to_thread(
+                self.upload_store.store_chunk,
                 session_id=sid,
                 transfer_id=str(header["transfer_id"]),
                 index=int(header["index"]),

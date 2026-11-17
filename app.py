@@ -50,8 +50,14 @@ def main() -> None:
     parser = argparse.ArgumentParser(
         description="Run FlowWeave (Frontend Dashboard + FastAPI Backend + Raw TCP Socket Receiver)"
     )
+    default_http_port = int(os.environ.get("PORT", "8080"))
     parser.add_argument("--host", default="0.0.0.0", help="HTTP bind address (default: 0.0.0.0)")
-    parser.add_argument("--port", type=int, default=8080, help="HTTP dashboard/API port (default: 8080)")
+    parser.add_argument(
+        "--port",
+        type=int,
+        default=default_http_port,
+        help="HTTP dashboard/API port (default: $PORT or 8080)",
+    )
     parser.add_argument(
         "--tcp-port",
         type=int,
@@ -77,6 +83,12 @@ def main() -> None:
     print(f"  Dashboard (LAN):     http://{lan_ip}:{args.port}")
     print(f"  TCP Receiver:        0.0.0.0:{args.tcp_port}  (LAN: {lan_ip}:{args.tcp_port})")
     print(f"  Downloads Folder:    {downloads_dir}")
+    if os.name == "nt":
+        print(
+            f"  Windows Firewall:    If another laptop times out, run (Admin PowerShell):\n"
+            f'                       netsh advfirewall firewall add rule name="FlowWeave TCP {args.tcp_port}" '
+            f"dir=in action=allow protocol=TCP localport={args.tcp_port}"
+        )
     print("-" * 66)
     print("  Run `python app.py` on BOTH laptops — switch between Sender & Receiver tabs.")
     print("=" * 66)

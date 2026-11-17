@@ -11,7 +11,9 @@ import uuid
 from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Any, Literal
+from urllib.parse import unquote, urlparse
 
+import aiohttp
 from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
@@ -29,6 +31,27 @@ from flowweave.transfer.security import safe_resolve_under, sanitize_filename
 from flowweave.transfer.tcp_protocol import recv_frame_async, send_frame_async
 from flowweave.transfer.tcp_server import FlowWeaveTCPServer, detect_all_local_ips
 from flowweave.transfer.test_server import LocalFileServer
+
+
+def _normalize_peer(raw_host: str, port: int) -> tuple[str, int]:
+    """Accept bare IPs, hostnames, `ip:port`, `tcp://ip:port`, or `http://ip:port` cleanly."""
+    cleaned = raw_host.strip()
+    if "://" in cleaned:
+        parsed = urlparse(cleaned)
+        host = parsed.hostname or cleaned
+        resolved_port = parsed.port or port
+    elif cleaned.count(":") == 1 and not cleaned.startswith("["):
+        host_part, port_part = cleaned.rsplit(":", 1)
+        host = host_part.strip()
+        resolved_port = int(port_part) if port_part.isdigit() else port
+    else:
+        host = cleaned.strip("[]")
+        resolved_port = port
+    if not host:
+        raise HTTPException(status_code=400, detail="Target receiver IP/host cannot be empty")
+    if resolved_port < 1 or resolved_port > 65535:
+        raise HTTPException(status_code=400, detail=f"Invalid target TCP port: {resolved_port}")
+    return host, resolved_port
 
 
 def _detect_lan_ip() -> str:
@@ -230,42 +253,91 @@ def create_app(config: FlowWeaveConfig | None = None, *, tcp_port: int | None = 
             recorded_runs.append(record)
         return record
 
-    async def _verify_tcp_peer(host: str, port: int) -> None:
-        """Fast 3s handshake check so unreachable hosts/firewalls report clear errors immediately."""
+    async def _probe_http_for_tcp_port(host: str, http_port: int) -> int | None:
+        """If the user entered the remote FlowWeave HTTP port (e.g. 8080), auto-discover its TCP port."""
         try:
-            reader, writer = await asyncio.wait_for(asyncio.open_connection(host, port), timeout=3.0)
+            timeout = aiohttp.ClientTimeout(total=2.5)
+            async with aiohttp.ClientSession(timeout=timeout) as sess:
+                async with sess.get(f"http://{host}:{http_port}/api/health") as resp:
+                    if resp.status == 200:
+                        data = await resp.json()
+                        tcp_p = data.get("tcp_server_port")
+                        if isinstance(tcp_p, int) and 1 <= tcp_p <= 65535 and tcp_p != http_port:
+                            return tcp_p
+        except Exception:
+            return None
+        return None
+
+    async def _verify_tcp_peer(raw_host: str, raw_port: int) -> tuple[str, int]:
+        """Fast 3s handshake check (with auto-discovery if user typed the HTTP port 8080)."""
+        host, port = _normalize_peer(raw_host, raw_port)
+
+        async def _try_handshake(h: str, p: int) -> None:
+            reader, writer = await asyncio.wait_for(asyncio.open_connection(h, p), timeout=3.5)
             try:
-                await send_frame_async(writer, {"op": "LIST"})
-                resp, _ = await asyncio.wait_for(recv_frame_async(reader), timeout=3.0)
+                await asyncio.wait_for(send_frame_async(writer, {"op": "LIST"}), timeout=3.5)
+                resp, _ = await asyncio.wait_for(recv_frame_async(reader), timeout=3.5)
                 if not resp.get("ok"):
                     raise RuntimeError(resp.get("error", "Remote peer rejected FWV1 handshake"))
             finally:
                 writer.close()
-                await writer.wait_closed()
+                try:
+                    await writer.wait_closed()
+                except Exception:
+                    pass
+
+        try:
+            await _try_handshake(host, port)
+            return host, port
+        except ValueError as exc:
+            # Common mistake: user typed the web dashboard port (e.g. 8080) instead of TCP port (9000).
+            if "b'HTTP'" in str(exc) or "HTTP" in str(exc):
+                discovered = await _probe_http_for_tcp_port(host, port)
+                if discovered is not None:
+                    try:
+                        await _try_handshake(host, discovered)
+                        return host, discovered
+                    except Exception:
+                        raise HTTPException(
+                            status_code=502,
+                            detail=(
+                                f"Port {port} on {host} is FlowWeave's web dashboard, and its TCP receiver "
+                                f"is on port {discovered}, but TCP {discovered} was blocked or unreachable. "
+                                f"On the receiver device, allow inbound TCP port {discovered} in Windows Firewall "
+                                f"and use port {discovered} here."
+                            ),
+                        )
+            raise HTTPException(
+                status_code=502,
+                detail=(
+                    f"Host {host}:{port} did not speak FlowWeave TCP protocol ({exc}). "
+                    f"Use the TCP port shown in the Receiver tab (default 9000), not the web port (8080)."
+                ),
+            )
         except TimeoutError:
             raise HTTPException(
                 status_code=502,
                 detail=(
-                    f"TCP connection to {host}:{port} timed out. Ensure FlowWeave receiver is running "
-                    f"on {host}:{port} (`python scripts/receiver.py --port {port}`), Windows Firewall "
-                    f"allows inbound TCP {port}, and Wi-Fi client isolation is not blocking peer traffic."
+                    f"TCP connection to {host}:{port} timed out. Check on the receiver device: "
+                    f"(1) `python app.py` is running and listening on port {port}, "
+                    f"(2) Windows Firewall allows inbound TCP {port} "
+                    f"(`netsh advfirewall firewall add rule name=\"FlowWeave TCP {port}\" dir=in action=allow protocol=TCP localport={port}`), "
+                    f"(3) both devices are on the same Wi-Fi/hotspot (college Wi-Fi often blocks device-to-device traffic via AP isolation — try a mobile hotspot)."
                 ),
             )
         except OSError as exc:
             raise HTTPException(
                 status_code=502,
                 detail=(
-                    f"Cannot reach FlowWeave TCP peer at {host}:{port} ({exc}). "
-                    f"Start `python scripts/receiver.py --port {port}` or `python -m flowweave tcp-server --port {port}` on that host."
+                    f"Cannot reach FlowWeave receiver at {host}:{port} ({exc}). "
+                    f"Confirm `python app.py` is running on {host}, the IP matches the Receiver tab's LAN IP, "
+                    f"and port {port} is open in the receiver's firewall."
                 ),
             )
         except Exception as exc:
             raise HTTPException(
                 status_code=502,
-                detail=(
-                    f"Host {host}:{port} did not speak FlowWeave TCP protocol ({exc}). "
-                    f"Make sure you run FlowWeave's TCP server (`scripts/receiver.py` or `flowweave tcp-server`) on port {port}."
-                ),
+                detail=f"FlowWeave TCP handshake with {host}:{port} failed: {exc}",
             )
 
     @asynccontextmanager
@@ -395,27 +467,33 @@ def create_app(config: FlowWeaveConfig | None = None, *, tcp_port: int | None = 
         port: int = Query(default=9000, ge=1, le=65535),
     ) -> dict[str, Any]:
         """Connect to another FlowWeave host via raw TCP socket and list its available files."""
+        resolved_host, resolved_port = await _verify_tcp_peer(host, port)
         t0 = time.monotonic()
         try:
-            reader, writer = await asyncio.wait_for(asyncio.open_connection(host, port), timeout=4.0)
+            reader, writer = await asyncio.wait_for(
+                asyncio.open_connection(resolved_host, resolved_port), timeout=4.0
+            )
             try:
-                await send_frame_async(writer, {"op": "LIST"})
+                await asyncio.wait_for(send_frame_async(writer, {"op": "LIST"}), timeout=4.0)
                 resp, _ = await asyncio.wait_for(recv_frame_async(reader), timeout=4.0)
             finally:
                 writer.close()
-                await writer.wait_closed()
+                try:
+                    await writer.wait_closed()
+                except Exception:
+                    pass
         except Exception as exc:
             raise HTTPException(
                 status_code=502,
-                detail=f"Could not connect to FlowWeave TCP server at {host}:{port} ({exc})",
+                detail=f"Could not connect to FlowWeave TCP server at {resolved_host}:{resolved_port} ({exc})",
             )
 
         rtt_ms = (time.monotonic() - t0) * 1000.0
         if not resp.get("ok"):
             raise HTTPException(status_code=502, detail=resp.get("error", "Remote TCP LIST failed"))
         return {
-            "host": host,
-            "port": port,
+            "host": resolved_host,
+            "port": resolved_port,
             "rtt_ms": round(rtt_ms, 2),
             "files": resp.get("files", []),
         }
@@ -433,7 +511,7 @@ def create_app(config: FlowWeaveConfig | None = None, *, tcp_port: int | None = 
     @app.post("/api/transfers/stage-browser", status_code=201)
     async def stage_browser_file(request: Request) -> dict[str, Any]:
         """Stage a real file selected in the browser so it can be sent or compared across policies."""
-        raw_name = request.headers.get("X-Filename", "upload.bin")
+        raw_name = unquote(request.headers.get("X-Filename", "upload.bin"))
         try:
             safe_name = sanitize_filename(raw_name, fallback="upload.bin")
         except ValueError as exc:
@@ -483,7 +561,7 @@ def create_app(config: FlowWeaveConfig | None = None, *, tcp_port: int | None = 
         items = [staged_files[i] for i in ids if i in staged_files and Path(staged_files[i]["path"]).is_file()]
         if not items:
             raise HTTPException(status_code=400, detail="No files selected to send")
-        await _verify_tcp_peer(req.host, req.port)
+        peer_host, peer_port = await _verify_tcp_peer(req.host, req.port)
 
         if req.policy is not None or req.link_cap_mbps is not None:
             coordinator.set_policy(
@@ -491,7 +569,7 @@ def create_app(config: FlowWeaveConfig | None = None, *, tcp_port: int | None = 
                 upload_link_capacity_bps=(req.link_cap_mbps * 1024 * 1024) if req.link_cap_mbps else None,
             )
 
-        target_url = f"tcp://{req.host}:{req.port}"
+        target_url = f"tcp://{peer_host}:{peer_port}"
         t0 = time.monotonic()
         launched = []
         tids = []
@@ -509,7 +587,7 @@ def create_app(config: FlowWeaveConfig | None = None, *, tcp_port: int | None = 
                 tids,
                 policy=coordinator.scheduler.name.value,
                 direction="upload",
-                target=f"{req.host}:{req.port}",
+                target=f"{peer_host}:{peer_port}",
                 t0=t0,
             )
         )
@@ -524,7 +602,7 @@ def create_app(config: FlowWeaveConfig | None = None, *, tcp_port: int | None = 
         items = [staged_files[i] for i in ids if i in staged_files and Path(staged_files[i]["path"]).is_file()]
         if not items:
             raise HTTPException(status_code=400, detail="Select at least one file first")
-        await _verify_tcp_peer(req.host, req.port)
+        peer_host, peer_port = await _verify_tcp_peer(req.host, req.port)
 
         async def _runner() -> None:
             compare_status.update(
@@ -536,7 +614,7 @@ def create_app(config: FlowWeaveConfig | None = None, *, tcp_port: int | None = 
                     "error": None,
                 }
             )
-            target_url = f"tcp://{req.host}:{req.port}"
+            target_url = f"tcp://{peer_host}:{peer_port}"
             try:
                 for pol in req.policies:
                     compare_status["current_policy"] = pol.value
@@ -558,7 +636,7 @@ def create_app(config: FlowWeaveConfig | None = None, *, tcp_port: int | None = 
                         tids,
                         policy=pol.value,
                         direction="upload",
-                        target=f"{req.host}:{req.port}",
+                        target=f"{peer_host}:{peer_port}",
                         t0=t0,
                     )
                     compare_status["completed_policies"].append(pol.value)
@@ -706,7 +784,7 @@ def create_app(config: FlowWeaveConfig | None = None, *, tcp_port: int | None = 
     @app.post("/api/transfers/upload-browser", status_code=201)
     async def upload_from_browser(request: Request) -> dict[str, Any]:
         """Accept raw file bytes from browser and transmit via raw TCP socket to target host."""
-        raw_name = request.headers.get("X-Filename", "browser_upload.bin")
+        raw_name = unquote(request.headers.get("X-Filename", "browser_upload.bin"))
         target_host = request.headers.get("X-Target-Host", "127.0.0.1")
         target_port_raw = request.headers.get("X-Target-Port")
         target_port = int(target_port_raw) if target_port_raw and target_port_raw.isdigit() else tcp_server.bound_port

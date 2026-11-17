@@ -76,11 +76,19 @@ export function fetchRemoteFiles(
 export async function stageBrowserFile(file: File): Promise<StagedFile> {
   const res = await fetch(`${BASE}/transfers/stage-browser`, {
     method: "POST",
-    headers: { "X-Filename": file.name },
+    headers: { "X-Filename": encodeURIComponent(file.name) },
     body: file,
   });
   if (!res.ok) {
-    throw new Error(await res.text());
+    let msg = `${res.status} ${res.statusText}`;
+    try {
+      const body = await res.json();
+      if (body?.detail) msg = String(body.detail);
+    } catch {
+      const text = await res.text();
+      if (text) msg = text;
+    }
+    throw new Error(msg);
   }
   const data = (await res.json()) as { file: StagedFile };
   return data.file;

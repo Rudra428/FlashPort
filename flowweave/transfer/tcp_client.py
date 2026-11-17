@@ -36,9 +36,22 @@ async def _open_tcp_connection(host: str, port: int, timeout_s: float) -> tuple[
     if raw_sock is not None:
         try:
             raw_sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+            raw_sock.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
         except OSError:
             pass
     return reader, writer
+
+
+async def _send_and_recv_frame(
+    reader: asyncio.StreamReader,
+    writer: asyncio.StreamWriter,
+    header: dict,
+    payload: bytes = b"",
+    *,
+    timeout_s: float = 30.0,
+) -> tuple[dict, bytes]:
+    await asyncio.wait_for(send_frame_async(writer, header, payload), timeout=timeout_s)
+    return await asyncio.wait_for(recv_frame_async(reader), timeout=timeout_s)
 
 
 class TCPDownloadEngine:
@@ -66,8 +79,12 @@ class TCPDownloadEngine:
         # 1. Query file size & SHA-256 over a TCP control connection.
         reader, writer = await _open_tcp_connection(host, port, self.config.request_timeout_s)
         try:
-            await send_frame_async(writer, {"op": "STAT", "filename": remote_name})
-            meta, _ = await recv_frame_async(reader)
+            meta, _ = await _send_and_recv_frame(
+                reader,
+                writer,
+                {"op": "STAT", "filename": remote_name},
+                timeout_s=self.config.request_timeout_s,
+            )
         finally:
             writer.close()
             await writer.wait_closed()
@@ -136,7 +153,8 @@ class TCPDownloadEngine:
                                     w_reader, w_writer = await _open_tcp_connection(
                                         host, port, self.config.request_timeout_s
                                     )
-                                await send_frame_async(
+                                resp, data = await _send_and_recv_frame(
+                                    w_reader,
                                     w_writer,
                                     {
                                         "op": "GET_CHUNK",
@@ -144,8 +162,8 @@ class TCPDownloadEngine:
                                         "offset": ch.start_byte,
                                         "length": chunk_len,
                                     },
+                                    timeout_s=self.config.request_timeout_s,
                                 )
-                                resp, data = await recv_frame_async(w_reader)
                                 if not resp.get("ok"):
                                     raise RuntimeError(resp.get("error", "GET_CHUNK failed"))
                                 rtt_ms = (time.monotonic() - t0) * 1000.0
@@ -276,7 +294,8 @@ class TCPUploadEngine:
         # 1. Initialize or resume upload session over TCP.
         reader, writer = await _open_tcp_connection(host, port, self.config.request_timeout_s)
         try:
-            await send_frame_async(
+            init_resp, _ = await _send_and_recv_frame(
+                reader,
                 writer,
                 {
                     "op": "PUT_INIT",
@@ -286,8 +305,8 @@ class TCPUploadEngine:
                     "transfer_id": transfer_id,
                     "expected_sha256": expected_sha,
                 },
+                timeout_s=self.config.request_timeout_s,
             )
-            init_resp, _ = await recv_frame_async(reader)
         finally:
             writer.close()
             await writer.wait_closed()
@@ -372,7 +391,8 @@ class TCPUploadEngine:
                                     w_reader, w_writer = await _open_tcp_connection(
                                         host, port, self.config.request_timeout_s
                                     )
-                                await send_frame_async(
+                                resp, _ = await _send_and_recv_frame(
+                                    w_reader,
                                     w_writer,
                                     {
                                         "op": "PUT_CHUNK",
@@ -384,8 +404,8 @@ class TCPUploadEngine:
                                         "chunk_sha256": chunk_sha,
                                     },
                                     raw_data,
+                                    timeout_s=self.config.request_timeout_s,
                                 )
-                                resp, _ = await recv_frame_async(w_reader)
                                 if not resp.get("ok"):
                                     raise RuntimeError(resp.get("error", "PUT_CHUNK failed"))
                                 rtt_ms = (time.monotonic() - t0) * 1000.0
@@ -433,11 +453,12 @@ class TCPUploadEngine:
         # 3. Atomically finalize & verify SHA-256 on TCP server.
         reader, writer = await _open_tcp_connection(host, port, self.config.request_timeout_s)
         try:
-            await send_frame_async(
+            fin, _ = await _send_and_recv_frame(
+                reader,
                 writer,
                 {"op": "PUT_COMPLETE", "session_id": session_id, "transfer_id": transfer_id},
+                timeout_s=self.config.request_timeout_s,
             )
-            fin, _ = await recv_frame_async(reader)
         finally:
             writer.close()
             await writer.wait_closed()

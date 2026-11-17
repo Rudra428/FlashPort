@@ -91,7 +91,8 @@ export const App: React.FC = () => {
   const [staged, setStaged] = useState<StagedFile[]>([]);
   const [linkCapMbps, setLinkCapMbps] = useState(2.5);
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
+  const [pollError, setPollError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const refresh = useCallback(async () => {
@@ -105,9 +106,9 @@ export const App: React.FC = () => {
       setRuns(runData.runs);
       setCompareStatus(runData.compare_status);
       setReceiver(recv);
-      setError(null);
+      setPollError(null);
     } catch (e) {
-      setError(String(e));
+      setPollError(String(e));
     }
   }, []);
 
@@ -126,13 +127,15 @@ export const App: React.FC = () => {
 
   async function handleTestConnection() {
     setBusy(true);
-    setError(null);
+    setActionError(null);
     try {
       const res = await fetchRemoteFiles(targetIp.trim(), targetPort);
+      setTargetIp(res.host);
+      setTargetPort(res.port);
       setConnectedInfo({ host: res.host, port: res.port, rtt_ms: res.rtt_ms });
     } catch (e) {
       setConnectedInfo(null);
-      setError(String(e));
+      setActionError(e instanceof Error ? e.message : String(e));
     } finally {
       setBusy(false);
     }
@@ -141,7 +144,7 @@ export const App: React.FC = () => {
   async function handlePickFiles(files: FileList | null) {
     if (!files || files.length === 0) return;
     setBusy(true);
-    setError(null);
+    setActionError(null);
     try {
       const added: StagedFile[] = [];
       for (const f of Array.from(files)) {
@@ -149,7 +152,7 @@ export const App: React.FC = () => {
       }
       setStaged((prev) => [...prev, ...added]);
     } catch (e) {
-      setError(String(e));
+      setActionError(e instanceof Error ? e.message : String(e));
     } finally {
       setBusy(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
@@ -157,7 +160,7 @@ export const App: React.FC = () => {
   }
 
   async function handlePolicySelect(policy: PolicyName) {
-    setError(null);
+    setActionError(null);
     try {
       const capBps = linkCapMbps * 1024 * 1024;
       await updateScheduler({
@@ -167,14 +170,14 @@ export const App: React.FC = () => {
       });
       refresh();
     } catch (e) {
-      setError(String(e));
+      setActionError(e instanceof Error ? e.message : String(e));
     }
   }
 
   async function handleSendAll() {
     if (staged.length === 0) return;
     setBusy(true);
-    setError(null);
+    setActionError(null);
     try {
       await sendStagedFiles({
         host: targetIp.trim(),
@@ -184,7 +187,7 @@ export const App: React.FC = () => {
       });
       refresh();
     } catch (e) {
-      setError(String(e));
+      setActionError(e instanceof Error ? e.message : String(e));
     } finally {
       setBusy(false);
     }
@@ -193,7 +196,7 @@ export const App: React.FC = () => {
   async function handleCompare(policies: PolicyName[]) {
     if (staged.length === 0) return;
     setBusy(true);
-    setError(null);
+    setActionError(null);
     try {
       await compareStagedFiles({
         host: targetIp.trim(),
@@ -203,7 +206,7 @@ export const App: React.FC = () => {
       });
       refresh();
     } catch (e) {
-      setError(String(e));
+      setActionError(e instanceof Error ? e.message : String(e));
     } finally {
       setBusy(false);
     }
@@ -211,12 +214,12 @@ export const App: React.FC = () => {
 
   async function handleAddPort() {
     setBusy(true);
-    setError(null);
+    setActionError(null);
     try {
       await addReceiverPort(newPortInput);
       refresh();
     } catch (e) {
-      setError(String(e));
+      setActionError(e instanceof Error ? e.message : String(e));
     } finally {
       setBusy(false);
     }
@@ -276,7 +279,23 @@ export const App: React.FC = () => {
         </div>
       </header>
 
-      {error && <div className="banner banner-error">{error}</div>}
+      {(actionError || pollError || compareStatus?.error) && (
+        <div
+          className="banner banner-error"
+          style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12 }}
+        >
+          <span>{actionError ?? compareStatus?.error ?? pollError}</span>
+          {actionError && (
+            <button
+              className="btn-xs"
+              onClick={() => setActionError(null)}
+              style={{ flexShrink: 0 }}
+            >
+              Dismiss
+            </button>
+          )}
+        </div>
+      )}
       {compareStatus?.running && (
         <div className="banner">
           Running live TCP comparison — currently executing{" "}
@@ -858,6 +877,28 @@ export const App: React.FC = () => {
                   + Listen on Port
                 </button>
               </div>
+            </div>
+
+            <div
+              className="muted"
+              style={{
+                marginTop: 12,
+                paddingTop: 10,
+                borderTop: "1px solid #27272a",
+                fontSize: "0.78rem",
+                lineHeight: 1.5,
+              }}
+            >
+              <strong>Cross-device checklist:</strong> (1) On the Sender device, enter{" "}
+              <code>{receiver?.lan_ip ?? "this LAN IP"}</code> and TCP port{" "}
+              <code>{receiver?.tcp_port ?? 9000}</code> (not web port 8080). (2) On Windows, if the
+              connection times out, open PowerShell as Administrator on this Receiver device and run:{" "}
+              <code>
+                netsh advfirewall firewall add rule name=&quot;FlowWeave TCP{" "}
+                {receiver?.tcp_port ?? 9000}&quot; dir=in action=allow protocol=TCP localport=
+                {receiver?.tcp_port ?? 9000}
+              </code>{" "}
+              (3) Both laptops must be on the same Wi-Fi/hotspot without client isolation.
             </div>
           </div>
 
