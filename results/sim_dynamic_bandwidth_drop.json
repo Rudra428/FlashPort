@@ -1,0 +1,2570 @@
+{
+  "is_simulated": true,
+  "summary": {
+    "scenario": "dynamic_bandwidth_drop",
+    "policy": "flowweave",
+    "seed": 42,
+    "is_simulated": true,
+    "num_transfers": 8,
+    "completed_transfers": 8,
+    "avg_fct_s": 2.3125,
+    "sum_fct_s": 18.5,
+    "p95_fct_s": 5.6975,
+    "makespan_s": 8.2,
+    "aggregate_goodput_bps": 8439758.05,
+    "jains_fairness": 0.8836,
+    "redundant_bytes": 1242535,
+    "redundant_ratio": 0.01764,
+    "scheduler_overhead_ms_total": 3.878,
+    "scheduler_overhead_ms_avg": 0.0479,
+    "replications_triggered": 1,
+    "replications_won": 0,
+    "outcomes": [
+      {
+        "transfer_id": "tx-1",
+        "filename": "dyn_1_1.0MB.bin",
+        "size_bytes": 1048576,
+        "arrival_time": 0.0,
+        "start_time": 0,
+        "completion_time": 0.2,
+        "fct_s": 0.2,
+        "avg_goodput_bps": 5242880.0,
+        "direction": "download",
+        "redundant_bytes": 5269,
+        "retries": 0,
+        "state": "completed"
+      },
+      {
+        "transfer_id": "tx-2",
+        "filename": "dyn_2_2.0MB.bin",
+        "size_bytes": 2097152,
+        "arrival_time": 0.25,
+        "start_time": 0.25,
+        "completion_time": 0.6,
+        "fct_s": 0.35,
+        "avg_goodput_bps": 5991862.857142857,
+        "direction": "download",
+        "redundant_bytes": 10538,
+        "retries": 0,
+        "state": "completed"
+      },
+      {
+        "transfer_id": "tx-3",
+        "filename": "dyn_3_3.0MB.bin",
+        "size_bytes": 3145728,
+        "arrival_time": 0.5,
+        "start_time": 0.5,
+        "completion_time": 0.8999999999999999,
+        "fct_s": 0.3999999999999999,
+        "avg_goodput_bps": 7864320.000000002,
+        "direction": "download",
+        "redundant_bytes": 15808,
+        "retries": 0,
+        "state": "completed"
+      },
+      {
+        "transfer_id": "tx-4",
+        "filename": "dyn_4_5.0MB.bin",
+        "size_bytes": 5242880,
+        "arrival_time": 0.75,
+        "start_time": 0.75,
+        "completion_time": 1.4000000000000001,
+        "fct_s": 0.6500000000000001,
+        "avg_goodput_bps": 8065969.230769229,
+        "direction": "download",
+        "redundant_bytes": 26346,
+        "retries": 0,
+        "state": "completed"
+      },
+      {
+        "transfer_id": "tx-5",
+        "filename": "dyn_5_8.0MB.bin",
+        "size_bytes": 8388608,
+        "arrival_time": 1.0,
+        "start_time": 1.0,
+        "completion_time": 3.1000000000000014,
+        "fct_s": 2.1000000000000014,
+        "avg_goodput_bps": 3994575.2380952355,
+        "direction": "download",
+        "redundant_bytes": 54745,
+        "retries": 1,
+        "state": "completed"
+      },
+      {
+        "transfer_id": "tx-6",
+        "filename": "dyn_6_12.0MB.bin",
+        "size_bytes": 12582912,
+        "arrival_time": 1.25,
+        "start_time": 1.25,
+        "completion_time": 5.299999999999997,
+        "fct_s": 4.049999999999997,
+        "avg_goodput_bps": 3106891.851851854,
+        "direction": "download",
+        "redundant_bytes": 358965,
+        "retries": 0,
+        "state": "completed"
+      },
+      {
+        "transfer_id": "tx-7",
+        "filename": "dyn_7_15.0MB.bin",
+        "size_bytes": 15728640,
+        "arrival_time": 1.5,
+        "start_time": 1.5,
+        "completion_time": 5.799999999999995,
+        "fct_s": 4.299999999999995,
+        "avg_goodput_bps": 3657823.255813957,
+        "direction": "download",
+        "redundant_bytes": 587294,
+        "retries": 1,
+        "state": "completed"
+      },
+      {
+        "transfer_id": "tx-8",
+        "filename": "dyn_8_20.0MB.bin",
+        "size_bytes": 20971520,
+        "arrival_time": 1.75,
+        "start_time": 1.75,
+        "completion_time": 8.199999999999987,
+        "fct_s": 6.449999999999987,
+        "avg_goodput_bps": 3251398.44961241,
+        "direction": "download",
+        "redundant_bytes": 183570,
+        "retries": 2,
+        "state": "completed"
+      }
+    ]
+  },
+  "capacity_violations": 0,
+  "timeline": [
+    {
+      "time_s": 0.1,
+      "active_transfers": 1.0,
+      "aggregate_goodput_bps": 10250878.98,
+      "scheduler_ms": 0.0683,
+      "remaining_bytes": {
+        "tx-1": 23489,
+        "tx-2": 2097152,
+        "tx-3": 3145728,
+        "tx-4": 5242880,
+        "tx-5": 8388608,
+        "tx-6": 12582912,
+        "tx-7": 15728640,
+        "tx-8": 20971520
+      },
+      "allocated_bps": {
+        "tx-1": 12582912.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 0.0,
+        "tx-6": 0.0,
+        "tx-7": 0.0,
+        "tx-8": 0.0
+      },
+      "link_utilization": {
+        "wan-primary": 0.8188,
+        "wan-backup": 0.0
+      }
+    },
+    {
+      "time_s": 0.2,
+      "active_transfers": 0.0,
+      "aggregate_goodput_bps": 234881.02,
+      "scheduler_ms": 0.036,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 2097152,
+        "tx-3": 3145728,
+        "tx-4": 5242880,
+        "tx-5": 8388608,
+        "tx-6": 12582912,
+        "tx-7": 15728640,
+        "tx-8": 20971520
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 0.0,
+        "tx-6": 0.0,
+        "tx-7": 0.0,
+        "tx-8": 0.0
+      },
+      "link_utilization": {
+        "wan-primary": 0.0188,
+        "wan-backup": 0.0
+      }
+    },
+    {
+      "time_s": 0.4,
+      "active_transfers": 1.0,
+      "aggregate_goodput_bps": 11267997.7,
+      "scheduler_ms": 0.0293,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 970353,
+        "tx-3": 3145728,
+        "tx-4": 5242880,
+        "tx-5": 8388608,
+        "tx-6": 12582912,
+        "tx-7": 15728640,
+        "tx-8": 20971520
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 12582912.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 0.0,
+        "tx-6": 0.0,
+        "tx-7": 0.0,
+        "tx-8": 0.0
+      },
+      "link_utilization": {
+        "wan-primary": 0.9,
+        "wan-backup": 0.0
+      }
+    },
+    {
+      "time_s": 0.5,
+      "active_transfers": 2.0,
+      "aggregate_goodput_bps": 7864320.0,
+      "scheduler_ms": 0.0301,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 183921,
+        "tx-3": 3145728,
+        "tx-4": 5242880,
+        "tx-5": 8388608,
+        "tx-6": 12582912,
+        "tx-7": 15728640,
+        "tx-8": 20971520
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 12582912.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 0.0,
+        "tx-6": 0.0,
+        "tx-7": 0.0,
+        "tx-8": 0.0
+      },
+      "link_utilization": {
+        "wan-primary": 0.6281,
+        "wan-backup": 0.0
+      }
+    },
+    {
+      "time_s": 0.6,
+      "active_transfers": 1.0,
+      "aggregate_goodput_bps": 8419322.96,
+      "scheduler_ms": 0.07,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 2487716,
+        "tx-4": 5242880,
+        "tx-5": 8388608,
+        "tx-6": 12582912,
+        "tx-7": 15728640,
+        "tx-8": 20971520
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 7347985.1,
+        "tx-4": 0.0,
+        "tx-5": 0.0,
+        "tx-6": 0.0,
+        "tx-7": 0.0,
+        "tx-8": 0.0
+      },
+      "link_utilization": {
+        "wan-primary": 0.6725,
+        "wan-backup": 0.0
+      }
+    },
+    {
+      "time_s": 0.7,
+      "active_transfers": 1.0,
+      "aggregate_goodput_bps": 12519997.44,
+      "scheduler_ms": 0.0449,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 1235717,
+        "tx-4": 5242880,
+        "tx-5": 8388608,
+        "tx-6": 12582912,
+        "tx-7": 15728640,
+        "tx-8": 20971520
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 12582912.0,
+        "tx-4": 0.0,
+        "tx-5": 0.0,
+        "tx-6": 0.0,
+        "tx-7": 0.0,
+        "tx-8": 0.0
+      },
+      "link_utilization": {
+        "wan-primary": 1.0,
+        "wan-backup": 0.0
+      }
+    },
+    {
+      "time_s": 0.8,
+      "active_transfers": 2.0,
+      "aggregate_goodput_bps": 12073017.41,
+      "scheduler_ms": 0.0398,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 28415,
+        "tx-4": 5242880,
+        "tx-5": 8388608,
+        "tx-6": 12582912,
+        "tx-7": 15728640,
+        "tx-8": 20971520
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 12582912.0,
+        "tx-4": 0.0,
+        "tx-5": 0.0,
+        "tx-6": 0.0,
+        "tx-7": 0.0,
+        "tx-8": 0.0
+      },
+      "link_utilization": {
+        "wan-primary": 0.9643,
+        "wan-backup": 0.0
+      }
+    },
+    {
+      "time_s": 0.9,
+      "active_transfers": 1.0,
+      "aggregate_goodput_bps": 8221557.02,
+      "scheduler_ms": 0.0751,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 4449139,
+        "tx-5": 8388608,
+        "tx-6": 12582912,
+        "tx-7": 15728640,
+        "tx-8": 20971520
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 8863665.58,
+        "tx-5": 0.0,
+        "tx-6": 0.0,
+        "tx-7": 0.0,
+        "tx-8": 0.0
+      },
+      "link_utilization": {
+        "wan-primary": 0.6567,
+        "wan-backup": 0.0
+      }
+    },
+    {
+      "time_s": 1.0,
+      "active_transfers": 1.0,
+      "aggregate_goodput_bps": 12519997.44,
+      "scheduler_ms": 0.0375,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 3197140,
+        "tx-5": 8388608,
+        "tx-6": 12582912,
+        "tx-7": 15728640,
+        "tx-8": 20971520
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 12582912.0,
+        "tx-5": 0.0,
+        "tx-6": 0.0,
+        "tx-7": 0.0,
+        "tx-8": 0.0
+      },
+      "link_utilization": {
+        "wan-primary": 1.0,
+        "wan-backup": 0.0
+      }
+    },
+    {
+      "time_s": 1.1,
+      "active_transfers": 2.0,
+      "aggregate_goodput_bps": 12519997.44,
+      "scheduler_ms": 0.0373,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 1945140,
+        "tx-5": 8388608,
+        "tx-6": 12582912,
+        "tx-7": 15728640,
+        "tx-8": 20971520
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 12582912.0,
+        "tx-5": 0.0,
+        "tx-6": 0.0,
+        "tx-7": 0.0,
+        "tx-8": 0.0
+      },
+      "link_utilization": {
+        "wan-primary": 1.0,
+        "wan-backup": 0.0
+      }
+    },
+    {
+      "time_s": 1.2,
+      "active_transfers": 2.0,
+      "aggregate_goodput_bps": 12382222.89,
+      "scheduler_ms": 0.0621,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 830915,
+        "tx-5": 8264611,
+        "tx-6": 12582912,
+        "tx-7": 15728640,
+        "tx-8": 20971520
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 11198243.19,
+        "tx-5": 1384668.81,
+        "tx-6": 0.0,
+        "tx-7": 0.0,
+        "tx-8": 0.0
+      },
+      "link_utilization": {
+        "wan-primary": 0.989,
+        "wan-backup": 0.0
+      }
+    },
+    {
+      "time_s": 1.3,
+      "active_transfers": 3.0,
+      "aggregate_goodput_bps": 7906395.53,
+      "scheduler_ms": 0.0497,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 151122,
+        "tx-5": 8153765,
+        "tx-6": 12582912,
+        "tx-7": 15728640,
+        "tx-8": 20971520
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 11468874.08,
+        "tx-5": 1114037.92,
+        "tx-6": 0.0,
+        "tx-7": 0.0,
+        "tx-8": 0.0
+      },
+      "link_utilization": {
+        "wan-primary": 0.6315,
+        "wan-backup": 0.0
+      }
+    },
+    {
+      "time_s": 1.4,
+      "active_transfers": 2.0,
+      "aggregate_goodput_bps": 9079270.46,
+      "scheduler_ms": 0.0602,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0,
+        "tx-5": 7454407,
+        "tx-6": 12525464,
+        "tx-7": 15728640,
+        "tx-8": 20971520
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 7028719.11,
+        "tx-6": 641521.08,
+        "tx-7": 0.0,
+        "tx-8": 0.0
+      },
+      "link_utilization": {
+        "wan-primary": 0.7252,
+        "wan-backup": 0.0
+      }
+    },
+    {
+      "time_s": 1.5,
+      "active_transfers": 3.0,
+      "aggregate_goodput_bps": 12519997.44,
+      "scheduler_ms": 0.0488,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0,
+        "tx-5": 6405193,
+        "tx-6": 12322679,
+        "tx-7": 15728640,
+        "tx-8": 20971520
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 10544864.84,
+        "tx-6": 2038047.16,
+        "tx-7": 0.0,
+        "tx-8": 0.0
+      },
+      "link_utilization": {
+        "wan-primary": 1.0,
+        "wan-backup": 0.0
+      }
+    },
+    {
+      "time_s": 1.6,
+      "active_transfers": 3.0,
+      "aggregate_goodput_bps": 9556779.51,
+      "scheduler_ms": 0.0562,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0,
+        "tx-5": 6291456,
+        "tx-6": 11621662,
+        "tx-7": 15587716,
+        "tx-8": 20971520
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 3700856.47,
+        "tx-6": 7260343.19,
+        "tx-7": 1621712.34,
+        "tx-8": 0.0
+      },
+      "link_utilization": {
+        "wan-primary": 0.7866,
+        "wan-backup": 0.0
+      }
+    },
+    {
+      "time_s": 1.7,
+      "active_transfers": 3.0,
+      "aggregate_goodput_bps": 15691730.12,
+      "scheduler_ms": 0.0611,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0,
+        "tx-5": 5874123,
+        "tx-6": 10675715,
+        "tx-7": 15381823,
+        "tx-8": 20971520
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 5242880.0,
+        "tx-6": 9507002.38,
+        "tx-7": 2069276.66,
+        "tx-8": 0.0
+      },
+      "link_utilization": {
+        "wan-primary": 0.92,
+        "wan-backup": 0.8
+      }
+    },
+    {
+      "time_s": 1.8,
+      "active_transfers": 4.0,
+      "aggregate_goodput_bps": 17736663.04,
+      "scheduler_ms": 0.0567,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0,
+        "tx-5": 5352457,
+        "tx-6": 9640681,
+        "tx-7": 15164857,
+        "tx-8": 20971520
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 5242880.0,
+        "tx-6": 10402355.16,
+        "tx-7": 2180556.84,
+        "tx-8": 0.0
+      },
+      "link_utilization": {
+        "wan-primary": 1.0,
+        "wan-backup": 1.0
+      }
+    },
+    {
+      "time_s": 1.9,
+      "active_transfers": 4.0,
+      "aggregate_goodput_bps": 5261139.2,
+      "scheduler_ms": 0.0678,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0,
+        "tx-5": 5242880,
+        "tx-6": 9437184,
+        "tx-7": 15043230,
+        "tx-8": 20880106
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 5242880.0,
+        "tx-6": 5242880.0,
+        "tx-7": 1222381.01,
+        "tx-8": 1020819.64
+      },
+      "link_utilization": {
+        "wan-primary": 0.3327,
+        "wan-backup": 0.2229
+      }
+    },
+    {
+      "time_s": 2.0,
+      "active_transfers": 4.0,
+      "aggregate_goodput_bps": 16359463.32,
+      "scheduler_ms": 0.0678,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0,
+        "tx-5": 4212893,
+        "tx-6": 9053238,
+        "tx-7": 14922212,
+        "tx-8": 20779112
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 10351634.44,
+        "tx-6": 4823449.6,
+        "tx-7": 1216263.06,
+        "tx-8": 1015014.49
+      },
+      "link_utilization": {
+        "wan-primary": 1.0,
+        "wan-backup": 0.736
+      }
+    },
+    {
+      "time_s": 2.1,
+      "active_transfers": 4.0,
+      "aggregate_goodput_bps": 2628297.48,
+      "scheduler_ms": 0.069,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0,
+        "tx-5": 4194304,
+        "tx-6": 8993682,
+        "tx-7": 14754040,
+        "tx-8": 20762599
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 2103996.69,
+        "tx-6": 598547.92,
+        "tx-7": 1903403.09,
+        "tx-8": 186904.22
+      },
+      "link_utilization": {
+        "wan-primary": 0.5485,
+        "wan-backup": 0.1142
+      }
+    },
+    {
+      "time_s": 2.2,
+      "active_transfers": 4.0,
+      "aggregate_goodput_bps": 8782844.19,
+      "scheduler_ms": 0.0637,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0,
+        "tx-5": 3769922,
+        "tx-6": 8934045,
+        "tx-7": 14394982,
+        "tx-8": 20727392
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 4265148.06,
+        "tx-6": 599372.97,
+        "tx-7": 3819768.22,
+        "tx-8": 374535.78
+      },
+      "link_utilization": {
+        "wan-primary": 1.0,
+        "wan-backup": 0.9278
+      }
+    },
+    {
+      "time_s": 2.3,
+      "active_transfers": 4.0,
+      "aggregate_goodput_bps": 8792791.82,
+      "scheduler_ms": 0.0655,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0,
+        "tx-5": 3341847,
+        "tx-6": 8877106,
+        "tx-7": 14035074,
+        "tx-8": 20693035
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 4302264.71,
+        "tx-6": 572253.94,
+        "tx-7": 3828802.41,
+        "tx-8": 365501.59
+      },
+      "link_utilization": {
+        "wan-primary": 1.0,
+        "wan-backup": 0.9297
+      }
+    },
+    {
+      "time_s": 2.4,
+      "active_transfers": 4.0,
+      "aggregate_goodput_bps": 8803400.62,
+      "scheduler_ms": 0.0742,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0,
+        "tx-5": 2909776,
+        "tx-6": 8823101,
+        "tx-7": 13674257,
+        "tx-8": 20659588
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 4342420.84,
+        "tx-6": 542759.92,
+        "tx-7": 3838484.25,
+        "tx-8": 355819.75
+      },
+      "link_utilization": {
+        "wan-primary": 1.0,
+        "wan-backup": 0.9318
+      }
+    },
+    {
+      "time_s": 2.5,
+      "active_transfers": 4.0,
+      "aggregate_goodput_bps": 8814718.2,
+      "scheduler_ms": 0.0631,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0,
+        "tx-5": 2473386,
+        "tx-6": 8772283,
+        "tx-7": 13312463,
+        "tx-8": 20627117
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 4385827.42,
+        "tx-6": 510727.79,
+        "tx-7": 3848867.08,
+        "tx-8": 345436.92
+      },
+      "link_utilization": {
+        "wan-primary": 1.0,
+        "wan-backup": 0.9339
+      }
+    },
+    {
+      "time_s": 2.6,
+      "active_transfers": 4.0,
+      "aggregate_goodput_bps": 8825518.5,
+      "scheduler_ms": 0.065,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0,
+        "tx-5": 2032339,
+        "tx-6": 8724918,
+        "tx-7": 12949740,
+        "tx-8": 20595702
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 4432636.84,
+        "tx-6": 476039.5,
+        "tx-7": 3858759.68,
+        "tx-8": 334203.66
+      },
+      "link_utilization": {
+        "wan-primary": 0.9997,
+        "wan-backup": 0.9363
+      }
+    },
+    {
+      "time_s": 2.7,
+      "active_transfers": 4.0,
+      "aggregate_goodput_bps": 8826226.49,
+      "scheduler_ms": 0.0657,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0,
+        "tx-5": 1586293,
+        "tx-6": 8681270,
+        "tx-7": 12587016,
+        "tx-8": 20565497
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 4482875.99,
+        "tx-6": 438672.95,
+        "tx-7": 3858759.68,
+        "tx-8": 321331.07
+      },
+      "link_utilization": {
+        "wan-primary": 0.9966,
+        "wan-backup": 0.9387
+      }
+    },
+    {
+      "time_s": 2.8,
+      "active_transfers": 4.0,
+      "aggregate_goodput_bps": 8826972.79,
+      "scheduler_ms": 0.067,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0,
+        "tx-5": 1134929,
+        "tx-6": 8641589,
+        "tx-7": 12224293,
+        "tx-8": 20536567
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 4536320.73,
+        "tx-6": 398797.23,
+        "tx-7": 3858759.68,
+        "tx-8": 307762.04
+      },
+      "link_utilization": {
+        "wan-primary": 0.9934,
+        "wan-backup": 0.9413
+      }
+    },
+    {
+      "time_s": 2.9,
+      "active_transfers": 4.0,
+      "aggregate_goodput_bps": 8827747.65,
+      "scheduler_ms": 0.0643,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0,
+        "tx-5": 678001,
+        "tx-6": 8606071,
+        "tx-7": 11861570,
+        "tx-8": 20508962
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 4592243.57,
+        "tx-6": 356962.75,
+        "tx-7": 3858759.68,
+        "tx-8": 293673.68
+      },
+      "link_utilization": {
+        "wan-primary": 0.99,
+        "wan-backup": 0.944
+      }
+    },
+    {
+      "time_s": 3.0,
+      "active_transfers": 4.0,
+      "aggregate_goodput_bps": 8828526.73,
+      "scheduler_ms": 0.0627,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0,
+        "tx-5": 215442,
+        "tx-6": 8574775,
+        "tx-7": 11498846,
+        "tx-8": 20482688
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 4648829.75,
+        "tx-6": 314541.71,
+        "tx-7": 3858759.68,
+        "tx-8": 279508.54
+      },
+      "link_utilization": {
+        "wan-primary": 0.9866,
+        "wan-backup": 0.9467
+      }
+    },
+    {
+      "time_s": 3.1,
+      "active_transfers": 3.0,
+      "aggregate_goodput_bps": 6513544.62,
+      "scheduler_ms": 0.0632,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0,
+        "tx-5": 0,
+        "tx-6": 8496548,
+        "tx-7": 11164264,
+        "tx-8": 20459583
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 0.0,
+        "tx-6": 1151105.8,
+        "tx-7": 3582038.95,
+        "tx-8": 247356.46
+      },
+      "link_utilization": {
+        "wan-primary": 0.9347,
+        "wan-backup": 0.5629
+      }
+    },
+    {
+      "time_s": 3.2,
+      "active_transfers": 3.0,
+      "aggregate_goodput_bps": 5541554.55,
+      "scheduler_ms": 0.0621,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0,
+        "tx-5": 0,
+        "tx-6": 8196715,
+        "tx-7": 10922292,
+        "tx-8": 20447232
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 0.0,
+        "tx-6": 4051383.91,
+        "tx-7": 2658369.88,
+        "tx-8": 497943.38
+      },
+      "link_utilization": {
+        "wan-primary": 0.9136,
+        "wan-backup": 0.5748
+      }
+    },
+    {
+      "time_s": 3.3,
+      "active_transfers": 3.0,
+      "aggregate_goodput_bps": 8702218.49,
+      "scheduler_ms": 0.0665,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0,
+        "tx-5": 0,
+        "tx-6": 7745889,
+        "tx-7": 10559569,
+        "tx-8": 20390560
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 0.0,
+        "tx-6": 4530914.12,
+        "tx-7": 3858759.68,
+        "tx-8": 711965.88
+      },
+      "link_utilization": {
+        "wan-primary": 0.92,
+        "wan-backup": 0.9728
+      }
+    },
+    {
+      "time_s": 3.4,
+      "active_transfers": 3.0,
+      "aggregate_goodput_bps": 8843899.7,
+      "scheduler_ms": 0.0578,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0,
+        "tx-5": 0,
+        "tx-6": 7293469,
+        "tx-7": 10196846,
+        "tx-8": 20321313
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 0.0,
+        "tx-6": 4546933.56,
+        "tx-7": 3858759.68,
+        "tx-8": 695946.44
+      },
+      "link_utilization": {
+        "wan-primary": 0.92,
+        "wan-backup": 1.0
+      }
+    },
+    {
+      "time_s": 3.5,
+      "active_transfers": 3.0,
+      "aggregate_goodput_bps": 8843899.7,
+      "scheduler_ms": 0.0759,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0,
+        "tx-5": 0,
+        "tx-6": 6839430,
+        "tx-7": 9834122,
+        "tx-8": 20253687
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 0.0,
+        "tx-6": 4563216.01,
+        "tx-7": 3858759.68,
+        "tx-8": 679663.99
+      },
+      "link_utilization": {
+        "wan-primary": 0.92,
+        "wan-backup": 1.0
+      }
+    },
+    {
+      "time_s": 3.6,
+      "active_transfers": 3.0,
+      "aggregate_goodput_bps": 8843899.7,
+      "scheduler_ms": 0.0577,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0,
+        "tx-5": 0,
+        "tx-6": 6383722,
+        "tx-7": 9471399,
+        "tx-8": 20187728
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 0.0,
+        "tx-6": 4579973.46,
+        "tx-7": 3858759.68,
+        "tx-8": 662906.54
+      },
+      "link_utilization": {
+        "wan-primary": 0.92,
+        "wan-backup": 1.0
+      }
+    },
+    {
+      "time_s": 3.7,
+      "active_transfers": 3.0,
+      "aggregate_goodput_bps": 8843899.7,
+      "scheduler_ms": 0.0557,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0,
+        "tx-5": 0,
+        "tx-6": 5926300,
+        "tx-7": 9108675,
+        "tx-8": 20123483
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 0.0,
+        "tx-6": 4597205.49,
+        "tx-7": 3858759.68,
+        "tx-8": 645674.51
+      },
+      "link_utilization": {
+        "wan-primary": 0.92,
+        "wan-backup": 1.0
+      }
+    },
+    {
+      "time_s": 3.8,
+      "active_transfers": 3.0,
+      "aggregate_goodput_bps": 8843899.7,
+      "scheduler_ms": 0.075,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0,
+        "tx-5": 0,
+        "tx-6": 5467117,
+        "tx-7": 8745952,
+        "tx-8": 20061000
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 0.0,
+        "tx-6": 4614907.01,
+        "tx-7": 3858759.68,
+        "tx-8": 627972.99
+      },
+      "link_utilization": {
+        "wan-primary": 0.92,
+        "wan-backup": 1.0
+      }
+    },
+    {
+      "time_s": 3.9,
+      "active_transfers": 3.0,
+      "aggregate_goodput_bps": 8843899.7,
+      "scheduler_ms": 0.0583,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0,
+        "tx-5": 0,
+        "tx-6": 5006127,
+        "tx-7": 8383229,
+        "tx-8": 20000323
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 0.0,
+        "tx-6": 4633067.29,
+        "tx-7": 3858759.68,
+        "tx-8": 609812.71
+      },
+      "link_utilization": {
+        "wan-primary": 0.92,
+        "wan-backup": 1.0
+      }
+    },
+    {
+      "time_s": 4.0,
+      "active_transfers": 3.0,
+      "aggregate_goodput_bps": 8843899.7,
+      "scheduler_ms": 0.0552,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0,
+        "tx-5": 0,
+        "tx-6": 4543286,
+        "tx-7": 8020505,
+        "tx-8": 19941498
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 0.0,
+        "tx-6": 4651668.16,
+        "tx-7": 3858759.68,
+        "tx-8": 591211.84
+      },
+      "link_utilization": {
+        "wan-primary": 0.92,
+        "wan-backup": 1.0
+      }
+    },
+    {
+      "time_s": 4.1,
+      "active_transfers": 3.0,
+      "aggregate_goodput_bps": 5742982.17,
+      "scheduler_ms": 0.0575,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0,
+        "tx-5": 0,
+        "tx-6": 4224815,
+        "tx-7": 7864320,
+        "tx-8": 19841855
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 0.0,
+        "tx-6": 3858759.68,
+        "tx-7": 4194304.0,
+        "tx-8": 1001437.03
+      },
+      "link_utilization": {
+        "wan-primary": 0.4106,
+        "wan-backup": 0.5725
+      }
+    },
+    {
+      "time_s": 4.2,
+      "active_transfers": 3.0,
+      "aggregate_goodput_bps": 7052199.67,
+      "scheduler_ms": 0.0583,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0,
+        "tx-5": 0,
+        "tx-6": 4012943,
+        "tx-7": 7447829,
+        "tx-8": 19764998
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 0.0,
+        "tx-6": 3457169.31,
+        "tx-7": 5024182.5,
+        "tx-8": 788060.04
+      },
+      "link_utilization": {
+        "wan-primary": 0.46,
+        "wan-backup": 0.7318
+      }
+    },
+    {
+      "time_s": 4.3,
+      "active_transfers": 3.0,
+      "aggregate_goodput_bps": 5476128.09,
+      "scheduler_ms": 0.0563,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0,
+        "tx-5": 0,
+        "tx-6": 3641420,
+        "tx-7": 7340032,
+        "tx-8": 19696705
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 0.0,
+        "tx-6": 5943561.91,
+        "tx-7": 3731654.14,
+        "tx-8": 686360.96
+      },
+      "link_utilization": {
+        "wan-primary": 0.2049,
+        "wan-backup": 0.6392
+      }
+    },
+    {
+      "time_s": 4.4,
+      "active_transfers": 3.0,
+      "aggregate_goodput_bps": 10346299.39,
+      "scheduler_ms": 0.0542,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0,
+        "tx-5": 0,
+        "tx-6": 3038136,
+        "tx-7": 6977309,
+        "tx-8": 19628083
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 0.0,
+        "tx-6": 6063154.45,
+        "tx-7": 3858759.68,
+        "tx-8": 689674.99
+      },
+      "link_utilization": {
+        "wan-primary": 0.92,
+        "wan-backup": 0.92
+      }
+    },
+    {
+      "time_s": 4.5,
+      "active_transfers": 3.0,
+      "aggregate_goodput_bps": 6401124.91,
+      "scheduler_ms": 0.0554,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0,
+        "tx-5": 0,
+        "tx-6": 2654189,
+        "tx-7": 6815744,
+        "tx-8": 19533481
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 0.0,
+        "tx-6": 3858759.68,
+        "tx-7": 4194304.0,
+        "tx-8": 950766.96
+      },
+      "link_utilization": {
+        "wan-primary": 0.425,
+        "wan-backup": 0.6552
+      }
+    },
+    {
+      "time_s": 4.6,
+      "active_transfers": 3.0,
+      "aggregate_goodput_bps": 4942424.83,
+      "scheduler_ms": 0.0521,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0,
+        "tx-5": 0,
+        "tx-6": 2621440,
+        "tx-7": 6413573,
+        "tx-8": 19474159
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 0.0,
+        "tx-6": 2529149.6,
+        "tx-7": 4192476.37,
+        "tx-8": 618406.03
+      },
+      "link_utilization": {
+        "wan-primary": 0.0,
+        "wan-backup": 0.7019
+      }
+    },
+    {
+      "time_s": 4.7,
+      "active_transfers": 3.0,
+      "aggregate_goodput_bps": 10346299.39,
+      "scheduler_ms": 0.0657,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0,
+        "tx-5": 0,
+        "tx-6": 2258717,
+        "tx-7": 5826026,
+        "tx-8": 19389799
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 0.0,
+        "tx-6": 3858759.68,
+        "tx-7": 5904988.7,
+        "tx-8": 847840.74
+      },
+      "link_utilization": {
+        "wan-primary": 0.92,
+        "wan-backup": 0.92
+      }
+    },
+    {
+      "time_s": 4.8,
+      "active_transfers": 3.0,
+      "aggregate_goodput_bps": 10930565.94,
+      "scheduler_ms": 0.0593,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0,
+        "tx-5": 0,
+        "tx-6": 1895994,
+        "tx-7": 5184112,
+        "tx-8": 19301380
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 0.0,
+        "tx-6": 3858759.68,
+        "tx-7": 6451397.17,
+        "tx-8": 888634.83
+      },
+      "link_utilization": {
+        "wan-primary": 0.92,
+        "wan-backup": 1.0
+      }
+    },
+    {
+      "time_s": 4.9,
+      "active_transfers": 3.0,
+      "aggregate_goodput_bps": 10930565.94,
+      "scheduler_ms": 0.0549,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0,
+        "tx-5": 0,
+        "tx-6": 1533270,
+        "tx-7": 4538506,
+        "tx-8": 19216654
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 0.0,
+        "tx-6": 3858759.68,
+        "tx-7": 6488510.43,
+        "tx-8": 851521.57
+      },
+      "link_utilization": {
+        "wan-primary": 0.92,
+        "wan-backup": 1.0
+      }
+    },
+    {
+      "time_s": 5.0,
+      "active_transfers": 3.0,
+      "aggregate_goodput_bps": 10930565.94,
+      "scheduler_ms": 0.0537,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0,
+        "tx-5": 0,
+        "tx-6": 1170547,
+        "tx-7": 3889076,
+        "tx-8": 19135750
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 0.0,
+        "tx-6": 3858759.68,
+        "tx-7": 6526932.46,
+        "tx-8": 813099.54
+      },
+      "link_utilization": {
+        "wan-primary": 0.92,
+        "wan-backup": 1.0
+      }
+    },
+    {
+      "time_s": 5.1,
+      "active_transfers": 3.0,
+      "aggregate_goodput_bps": 10930565.94,
+      "scheduler_ms": 0.0529,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0,
+        "tx-5": 0,
+        "tx-6": 807823,
+        "tx-7": 3235707,
+        "tx-8": 19058786
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 0.0,
+        "tx-6": 3858759.68,
+        "tx-7": 6566523.41,
+        "tx-8": 773508.59
+      },
+      "link_utilization": {
+        "wan-primary": 0.92,
+        "wan-backup": 1.0
+      }
+    },
+    {
+      "time_s": 5.2,
+      "active_transfers": 3.0,
+      "aggregate_goodput_bps": 3868072.69,
+      "scheduler_ms": 0.0533,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0,
+        "tx-5": 0,
+        "tx-6": 524288,
+        "tx-7": 3171899,
+        "tx-8": 19019321
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 0.0,
+        "tx-6": 4194304.0,
+        "tx-7": 641281.68,
+        "tx-8": 396631.06
+      },
+      "link_utilization": {
+        "wan-primary": 0.7449,
+        "wan-backup": 0.1414
+      }
+    },
+    {
+      "time_s": 5.3,
+      "active_transfers": 2.0,
+      "aggregate_goodput_bps": 6166074.96,
+      "scheduler_ms": 0.0532,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0,
+        "tx-5": 0,
+        "tx-6": 0,
+        "tx-7": 3117939,
+        "tx-8": 18980962
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 0.0,
+        "tx-6": 0.0,
+        "tx-7": 542311.61,
+        "tx-8": 385522.52
+      },
+      "link_utilization": {
+        "wan-primary": 0.0,
+        "wan-backup": 0.8443
+      }
+    },
+    {
+      "time_s": 5.4,
+      "active_transfers": 2.0,
+      "aggregate_goodput_bps": 7303331.84,
+      "scheduler_ms": 0.0463,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0,
+        "tx-5": 0,
+        "tx-6": 0,
+        "tx-7": 2459874,
+        "tx-8": 18908694
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 0.0,
+        "tx-6": 0.0,
+        "tx-7": 6613717.19,
+        "tx-8": 726314.81
+      },
+      "link_utilization": {
+        "wan-primary": 0.0,
+        "wan-backup": 1.0
+      }
+    },
+    {
+      "time_s": 5.5,
+      "active_transfers": 2.0,
+      "aggregate_goodput_bps": 7303331.84,
+      "scheduler_ms": 0.046,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0,
+        "tx-5": 0,
+        "tx-6": 0,
+        "tx-7": 1797704,
+        "tx-8": 18840531
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 0.0,
+        "tx-6": 0.0,
+        "tx-7": 6654980.58,
+        "tx-8": 685051.42
+      },
+      "link_utilization": {
+        "wan-primary": 0.0,
+        "wan-backup": 1.0
+      }
+    },
+    {
+      "time_s": 5.6,
+      "active_transfers": 2.0,
+      "aggregate_goodput_bps": 7303331.84,
+      "scheduler_ms": 0.0484,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0,
+        "tx-5": 0,
+        "tx-6": 0,
+        "tx-7": 1131448,
+        "tx-8": 18776454
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 0.0,
+        "tx-6": 0.0,
+        "tx-7": 6696041.43,
+        "tx-8": 643990.57
+      },
+      "link_utilization": {
+        "wan-primary": 0.0,
+        "wan-backup": 1.0
+      }
+    },
+    {
+      "time_s": 5.7,
+      "active_transfers": 2.0,
+      "aggregate_goodput_bps": 7303331.84,
+      "scheduler_ms": 0.0483,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0,
+        "tx-5": 0,
+        "tx-6": 0,
+        "tx-7": 461243,
+        "tx-8": 18716325
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 0.0,
+        "tx-6": 0.0,
+        "tx-7": 6735721.33,
+        "tx-8": 604310.67
+      },
+      "link_utilization": {
+        "wan-primary": 0.0,
+        "wan-backup": 1.0
+      }
+    },
+    {
+      "time_s": 5.8,
+      "active_transfers": 1.0,
+      "aggregate_goodput_bps": 5178034.01,
+      "scheduler_ms": 0.0463,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0,
+        "tx-5": 0,
+        "tx-6": 0,
+        "tx-7": 0,
+        "tx-8": 18659764
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 0.0,
+        "tx-6": 0.0,
+        "tx-7": 0.0,
+        "tx-8": 568447.93
+      },
+      "link_utilization": {
+        "wan-primary": 0.0,
+        "wan-backup": 0.709
+      }
+    },
+    {
+      "time_s": 5.9,
+      "active_transfers": 1.0,
+      "aggregate_goodput_bps": 7303331.84,
+      "scheduler_ms": 0.0273,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0,
+        "tx-5": 0,
+        "tx-6": 0,
+        "tx-7": 0,
+        "tx-8": 17929431
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 0.0,
+        "tx-6": 0.0,
+        "tx-7": 0.0,
+        "tx-8": 7340032.0
+      },
+      "link_utilization": {
+        "wan-primary": 0.0,
+        "wan-backup": 1.0
+      }
+    },
+    {
+      "time_s": 6.0,
+      "active_transfers": 1.0,
+      "aggregate_goodput_bps": 7303331.84,
+      "scheduler_ms": 0.0279,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0,
+        "tx-5": 0,
+        "tx-6": 0,
+        "tx-7": 0,
+        "tx-8": 17199098
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 0.0,
+        "tx-6": 0.0,
+        "tx-7": 0.0,
+        "tx-8": 7340032.0
+      },
+      "link_utilization": {
+        "wan-primary": 0.0,
+        "wan-backup": 1.0
+      }
+    },
+    {
+      "time_s": 6.1,
+      "active_transfers": 1.0,
+      "aggregate_goodput_bps": 7303331.84,
+      "scheduler_ms": 0.0276,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0,
+        "tx-5": 0,
+        "tx-6": 0,
+        "tx-7": 0,
+        "tx-8": 16468765
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 0.0,
+        "tx-6": 0.0,
+        "tx-7": 0.0,
+        "tx-8": 7340032.0
+      },
+      "link_utilization": {
+        "wan-primary": 0.0,
+        "wan-backup": 1.0
+      }
+    },
+    {
+      "time_s": 6.2,
+      "active_transfers": 1.0,
+      "aggregate_goodput_bps": 7303331.84,
+      "scheduler_ms": 0.0274,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0,
+        "tx-5": 0,
+        "tx-6": 0,
+        "tx-7": 0,
+        "tx-8": 15738432
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 0.0,
+        "tx-6": 0.0,
+        "tx-7": 0.0,
+        "tx-8": 7340032.0
+      },
+      "link_utilization": {
+        "wan-primary": 0.0,
+        "wan-backup": 1.0
+      }
+    },
+    {
+      "time_s": 6.3,
+      "active_transfers": 1.0,
+      "aggregate_goodput_bps": 7303331.84,
+      "scheduler_ms": 0.0267,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0,
+        "tx-5": 0,
+        "tx-6": 0,
+        "tx-7": 0,
+        "tx-8": 15008099
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 0.0,
+        "tx-6": 0.0,
+        "tx-7": 0.0,
+        "tx-8": 7340032.0
+      },
+      "link_utilization": {
+        "wan-primary": 0.0,
+        "wan-backup": 1.0
+      }
+    },
+    {
+      "time_s": 6.4,
+      "active_transfers": 1.0,
+      "aggregate_goodput_bps": 7303331.84,
+      "scheduler_ms": 0.0255,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0,
+        "tx-5": 0,
+        "tx-6": 0,
+        "tx-7": 0,
+        "tx-8": 14277765
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 0.0,
+        "tx-6": 0.0,
+        "tx-7": 0.0,
+        "tx-8": 7340032.0
+      },
+      "link_utilization": {
+        "wan-primary": 0.0,
+        "wan-backup": 1.0
+      }
+    },
+    {
+      "time_s": 6.5,
+      "active_transfers": 1.0,
+      "aggregate_goodput_bps": 7303331.84,
+      "scheduler_ms": 0.0257,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0,
+        "tx-5": 0,
+        "tx-6": 0,
+        "tx-7": 0,
+        "tx-8": 13547432
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 0.0,
+        "tx-6": 0.0,
+        "tx-7": 0.0,
+        "tx-8": 7340032.0
+      },
+      "link_utilization": {
+        "wan-primary": 0.0,
+        "wan-backup": 1.0
+      }
+    },
+    {
+      "time_s": 6.6,
+      "active_transfers": 1.0,
+      "aggregate_goodput_bps": 7303331.84,
+      "scheduler_ms": 0.0257,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0,
+        "tx-5": 0,
+        "tx-6": 0,
+        "tx-7": 0,
+        "tx-8": 12817099
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 0.0,
+        "tx-6": 0.0,
+        "tx-7": 0.0,
+        "tx-8": 7340032.0
+      },
+      "link_utilization": {
+        "wan-primary": 0.0,
+        "wan-backup": 1.0
+      }
+    },
+    {
+      "time_s": 6.7,
+      "active_transfers": 1.0,
+      "aggregate_goodput_bps": 7303331.84,
+      "scheduler_ms": 0.0262,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0,
+        "tx-5": 0,
+        "tx-6": 0,
+        "tx-7": 0,
+        "tx-8": 12086766
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 0.0,
+        "tx-6": 0.0,
+        "tx-7": 0.0,
+        "tx-8": 7340032.0
+      },
+      "link_utilization": {
+        "wan-primary": 0.0,
+        "wan-backup": 1.0
+      }
+    },
+    {
+      "time_s": 6.8,
+      "active_transfers": 1.0,
+      "aggregate_goodput_bps": 7303331.84,
+      "scheduler_ms": 0.0258,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0,
+        "tx-5": 0,
+        "tx-6": 0,
+        "tx-7": 0,
+        "tx-8": 11356433
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 0.0,
+        "tx-6": 0.0,
+        "tx-7": 0.0,
+        "tx-8": 7340032.0
+      },
+      "link_utilization": {
+        "wan-primary": 0.0,
+        "wan-backup": 1.0
+      }
+    },
+    {
+      "time_s": 6.9,
+      "active_transfers": 1.0,
+      "aggregate_goodput_bps": 7303331.84,
+      "scheduler_ms": 0.0256,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0,
+        "tx-5": 0,
+        "tx-6": 0,
+        "tx-7": 0,
+        "tx-8": 10626099
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 0.0,
+        "tx-6": 0.0,
+        "tx-7": 0.0,
+        "tx-8": 7340032.0
+      },
+      "link_utilization": {
+        "wan-primary": 0.0,
+        "wan-backup": 1.0
+      }
+    },
+    {
+      "time_s": 7.0,
+      "active_transfers": 1.0,
+      "aggregate_goodput_bps": 7303331.84,
+      "scheduler_ms": 0.0267,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0,
+        "tx-5": 0,
+        "tx-6": 0,
+        "tx-7": 0,
+        "tx-8": 9895766
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 0.0,
+        "tx-6": 0.0,
+        "tx-7": 0.0,
+        "tx-8": 7340032.0
+      },
+      "link_utilization": {
+        "wan-primary": 0.0,
+        "wan-backup": 1.0
+      }
+    },
+    {
+      "time_s": 7.1,
+      "active_transfers": 1.0,
+      "aggregate_goodput_bps": 7303331.84,
+      "scheduler_ms": 0.0257,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0,
+        "tx-5": 0,
+        "tx-6": 0,
+        "tx-7": 0,
+        "tx-8": 9165433
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 0.0,
+        "tx-6": 0.0,
+        "tx-7": 0.0,
+        "tx-8": 7340032.0
+      },
+      "link_utilization": {
+        "wan-primary": 0.0,
+        "wan-backup": 1.0
+      }
+    },
+    {
+      "time_s": 7.2,
+      "active_transfers": 1.0,
+      "aggregate_goodput_bps": 2525365.92,
+      "scheduler_ms": 0.0267,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0,
+        "tx-5": 0,
+        "tx-6": 0,
+        "tx-7": 0,
+        "tx-8": 8912896
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 0.0,
+        "tx-6": 0.0,
+        "tx-7": 0.0,
+        "tx-8": 7340032.0
+      },
+      "link_utilization": {
+        "wan-primary": 0.0,
+        "wan-backup": 0.3566
+      }
+    },
+    {
+      "time_s": 7.3,
+      "active_transfers": 1.0,
+      "aggregate_goodput_bps": 10380902.4,
+      "scheduler_ms": 0.0275,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0,
+        "tx-5": 0,
+        "tx-6": 0,
+        "tx-7": 0,
+        "tx-8": 7874806
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 0.0,
+        "tx-6": 0.0,
+        "tx-7": 0.0,
+        "tx-8": 10485760.0
+      },
+      "link_utilization": {
+        "wan-primary": 1.0,
+        "wan-backup": 0.0
+      }
+    },
+    {
+      "time_s": 7.4,
+      "active_transfers": 1.0,
+      "aggregate_goodput_bps": 10380902.4,
+      "scheduler_ms": 0.0255,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0,
+        "tx-5": 0,
+        "tx-6": 0,
+        "tx-7": 0,
+        "tx-8": 6836716
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 0.0,
+        "tx-6": 0.0,
+        "tx-7": 0.0,
+        "tx-8": 10485760.0
+      },
+      "link_utilization": {
+        "wan-primary": 1.0,
+        "wan-backup": 0.0
+      }
+    },
+    {
+      "time_s": 7.5,
+      "active_transfers": 1.0,
+      "aggregate_goodput_bps": 10380902.4,
+      "scheduler_ms": 0.0268,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0,
+        "tx-5": 0,
+        "tx-6": 0,
+        "tx-7": 0,
+        "tx-8": 5798626
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 0.0,
+        "tx-6": 0.0,
+        "tx-7": 0.0,
+        "tx-8": 10485760.0
+      },
+      "link_utilization": {
+        "wan-primary": 1.0,
+        "wan-backup": 0.0
+      }
+    },
+    {
+      "time_s": 7.6,
+      "active_transfers": 1.0,
+      "aggregate_goodput_bps": 10380902.4,
+      "scheduler_ms": 0.0251,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0,
+        "tx-5": 0,
+        "tx-6": 0,
+        "tx-7": 0,
+        "tx-8": 4760536
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 0.0,
+        "tx-6": 0.0,
+        "tx-7": 0.0,
+        "tx-8": 10485760.0
+      },
+      "link_utilization": {
+        "wan-primary": 1.0,
+        "wan-backup": 0.0
+      }
+    },
+    {
+      "time_s": 7.7,
+      "active_transfers": 1.0,
+      "aggregate_goodput_bps": 10380902.4,
+      "scheduler_ms": 0.0261,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0,
+        "tx-5": 0,
+        "tx-6": 0,
+        "tx-7": 0,
+        "tx-8": 3722445
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 0.0,
+        "tx-6": 0.0,
+        "tx-7": 0.0,
+        "tx-8": 10485760.0
+      },
+      "link_utilization": {
+        "wan-primary": 1.0,
+        "wan-backup": 0.0
+      }
+    },
+    {
+      "time_s": 7.8,
+      "active_transfers": 1.0,
+      "aggregate_goodput_bps": 10380902.4,
+      "scheduler_ms": 0.0262,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0,
+        "tx-5": 0,
+        "tx-6": 0,
+        "tx-7": 0,
+        "tx-8": 2684355
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 0.0,
+        "tx-6": 0.0,
+        "tx-7": 0.0,
+        "tx-8": 10485760.0
+      },
+      "link_utilization": {
+        "wan-primary": 1.0,
+        "wan-backup": 0.0
+      }
+    },
+    {
+      "time_s": 7.9,
+      "active_transfers": 1.0,
+      "aggregate_goodput_bps": 10380902.4,
+      "scheduler_ms": 0.0251,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0,
+        "tx-5": 0,
+        "tx-6": 0,
+        "tx-7": 0,
+        "tx-8": 1646265
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 0.0,
+        "tx-6": 0.0,
+        "tx-7": 0.0,
+        "tx-8": 10485760.0
+      },
+      "link_utilization": {
+        "wan-primary": 1.0,
+        "wan-backup": 0.0
+      }
+    },
+    {
+      "time_s": 8.0,
+      "active_transfers": 1.0,
+      "aggregate_goodput_bps": 10380902.4,
+      "scheduler_ms": 0.0253,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0,
+        "tx-5": 0,
+        "tx-6": 0,
+        "tx-7": 0,
+        "tx-8": 608175
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 0.0,
+        "tx-6": 0.0,
+        "tx-7": 0.0,
+        "tx-8": 10485760.0
+      },
+      "link_utilization": {
+        "wan-primary": 1.0,
+        "wan-backup": 0.0
+      }
+    },
+    {
+      "time_s": 8.1,
+      "active_transfers": 1.0,
+      "aggregate_goodput_bps": 5609881.6,
+      "scheduler_ms": 0.0256,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0,
+        "tx-5": 0,
+        "tx-6": 0,
+        "tx-7": 0,
+        "tx-8": 47186
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 0.0,
+        "tx-6": 0.0,
+        "tx-7": 0.0,
+        "tx-8": 10485760.0
+      },
+      "link_utilization": {
+        "wan-primary": 0.5404,
+        "wan-backup": 0.0
+      }
+    },
+    {
+      "time_s": 8.2,
+      "active_transfers": 0.0,
+      "aggregate_goodput_bps": 471859.2,
+      "scheduler_ms": 0.0259,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0,
+        "tx-5": 0,
+        "tx-6": 0,
+        "tx-7": 0,
+        "tx-8": 0
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0,
+        "tx-5": 0.0,
+        "tx-6": 0.0,
+        "tx-7": 0.0,
+        "tx-8": 0.0
+      },
+      "link_utilization": {
+        "wan-primary": 0.0455,
+        "wan-backup": 0.0
+      }
+    }
+  ]
+}

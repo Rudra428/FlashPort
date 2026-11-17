@@ -1,0 +1,934 @@
+{
+  "is_simulated": true,
+  "summary": {
+    "scenario": "partially_shared_paths",
+    "policy": "flowweave",
+    "seed": 42,
+    "is_simulated": true,
+    "num_transfers": 4,
+    "completed_transfers": 4,
+    "avg_fct_s": 1.775,
+    "sum_fct_s": 7.1,
+    "p95_fct_s": 3.205,
+    "makespan_s": 3.4,
+    "aggregate_goodput_bps": 11719378.82,
+    "jains_fairness": 0.9969,
+    "redundant_bytes": 136999,
+    "redundant_ratio": 0.00343,
+    "scheduler_overhead_ms_total": 2.4379,
+    "scheduler_overhead_ms_avg": 0.0717,
+    "replications_triggered": 0,
+    "replications_won": 0,
+    "outcomes": [
+      {
+        "transfer_id": "tx-1",
+        "filename": "shared_small_2MB.bin",
+        "size_bytes": 2097152,
+        "arrival_time": 0.0,
+        "start_time": 0,
+        "completion_time": 0.4,
+        "fct_s": 0.4,
+        "avg_goodput_bps": 5242880.0,
+        "direction": "download",
+        "redundant_bytes": 10538,
+        "retries": 0,
+        "state": "completed"
+      },
+      {
+        "transfer_id": "tx-2",
+        "filename": "shared_med_6MB.bin",
+        "size_bytes": 6291456,
+        "arrival_time": 0.0,
+        "start_time": 0,
+        "completion_time": 1.2,
+        "fct_s": 1.2,
+        "avg_goodput_bps": 5242880.0,
+        "direction": "download",
+        "redundant_bytes": 31615,
+        "retries": 0,
+        "state": "completed"
+      },
+      {
+        "transfer_id": "tx-3",
+        "filename": "shared_large_18MB.bin",
+        "size_bytes": 18874368,
+        "arrival_time": 0.0,
+        "start_time": 0,
+        "completion_time": 3.4000000000000017,
+        "fct_s": 3.4000000000000017,
+        "avg_goodput_bps": 5551284.70588235,
+        "direction": "download",
+        "redundant_bytes": 94846,
+        "retries": 0,
+        "state": "completed"
+      },
+      {
+        "transfer_id": "tx-4",
+        "filename": "isolated_12MB.bin",
+        "size_bytes": 12582912,
+        "arrival_time": 0.0,
+        "start_time": 0,
+        "completion_time": 2.1000000000000005,
+        "fct_s": 2.1000000000000005,
+        "avg_goodput_bps": 5991862.857142855,
+        "direction": "download",
+        "redundant_bytes": 0,
+        "retries": 0,
+        "state": "completed"
+      }
+    ]
+  },
+  "capacity_violations": 0,
+  "timeline": [
+    {
+      "time_s": 0.1,
+      "active_transfers": 4.0,
+      "aggregate_goodput_bps": 13122928.64,
+      "scheduler_ms": 0.1823,
+      "remaining_bytes": {
+        "tx-1": 1439853,
+        "tx-2": 6254940,
+        "tx-3": 18837852,
+        "tx-4": 12000953
+      },
+      "allocated_bps": {
+        "tx-1": 7549747.2,
+        "tx-2": 419430.4,
+        "tx-3": 419430.4,
+        "tx-4": 6291456.0
+      },
+      "link_utilization": {
+        "access-1": 0.525,
+        "access-2": 0.0292,
+        "access-3": 0.0292,
+        "core-bottleneck": 0.875,
+        "direct-link": 0.925
+      }
+    },
+    {
+      "time_s": 0.2,
+      "active_transfers": 4.0,
+      "aggregate_goodput_bps": 14638120.96,
+      "scheduler_ms": 0.1213,
+      "remaining_bytes": {
+        "tx-1": 688653,
+        "tx-2": 6213207,
+        "tx-3": 18796119,
+        "tx-4": 11371807
+      },
+      "allocated_bps": {
+        "tx-1": 7549747.2,
+        "tx-2": 419430.4,
+        "tx-3": 419430.4,
+        "tx-4": 6291456.0
+      },
+      "link_utilization": {
+        "access-1": 0.6,
+        "access-2": 0.0333,
+        "access-3": 0.0333,
+        "core-bottleneck": 1.0,
+        "direct-link": 1.0
+      }
+    },
+    {
+      "time_s": 0.3,
+      "active_transfers": 4.0,
+      "aggregate_goodput_bps": 13855883.26,
+      "scheduler_ms": 0.0959,
+      "remaining_bytes": {
+        "tx-1": 15677,
+        "tx-2": 6171473,
+        "tx-3": 18754385,
+        "tx-4": 10742662
+      },
+      "allocated_bps": {
+        "tx-1": 7549747.2,
+        "tx-2": 419430.4,
+        "tx-3": 419430.4,
+        "tx-4": 6291456.0
+      },
+      "link_utilization": {
+        "access-1": 0.5375,
+        "access-2": 0.0333,
+        "access-3": 0.0333,
+        "core-bottleneck": 0.9063,
+        "direct-link": 1.0
+      }
+    },
+    {
+      "time_s": 0.4,
+      "active_transfers": 3.0,
+      "aggregate_goodput_bps": 14377549.82,
+      "scheduler_ms": 0.0968,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 5420273,
+        "tx-3": 18712652,
+        "tx-4": 10113516
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 7549747.2,
+        "tx-3": 419430.4,
+        "tx-4": 6291456.0
+      },
+      "link_utilization": {
+        "access-1": 0.0125,
+        "access-2": 0.6,
+        "access-3": 0.0333,
+        "core-bottleneck": 0.9688,
+        "direct-link": 1.0
+      }
+    },
+    {
+      "time_s": 0.5,
+      "active_transfers": 3.0,
+      "aggregate_goodput_bps": 14638120.96,
+      "scheduler_ms": 0.0819,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 4648207,
+        "tx-3": 18650052,
+        "tx-4": 9484370
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 7759462.4,
+        "tx-3": 629145.6,
+        "tx-4": 6291456.0
+      },
+      "link_utilization": {
+        "access-1": 0.0,
+        "access-2": 0.6167,
+        "access-3": 0.05,
+        "core-bottleneck": 1.0,
+        "direct-link": 1.0
+      }
+    },
+    {
+      "time_s": 0.6,
+      "active_transfers": 3.0,
+      "aggregate_goodput_bps": 14638120.96,
+      "scheduler_ms": 0.0795,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 3876140,
+        "tx-3": 18587452,
+        "tx-4": 8855225
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 7759462.4,
+        "tx-3": 629145.6,
+        "tx-4": 6291456.0
+      },
+      "link_utilization": {
+        "access-1": 0.0,
+        "access-2": 0.6167,
+        "access-3": 0.05,
+        "core-bottleneck": 1.0,
+        "direct-link": 1.0
+      }
+    },
+    {
+      "time_s": 0.7,
+      "active_transfers": 3.0,
+      "aggregate_goodput_bps": 14638120.96,
+      "scheduler_ms": 0.0759,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 3104074,
+        "tx-3": 18524852,
+        "tx-4": 8226079
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 7759462.4,
+        "tx-3": 629145.6,
+        "tx-4": 6291456.0
+      },
+      "link_utilization": {
+        "access-1": 0.0,
+        "access-2": 0.6167,
+        "access-3": 0.05,
+        "core-bottleneck": 1.0,
+        "direct-link": 1.0
+      }
+    },
+    {
+      "time_s": 0.8,
+      "active_transfers": 3.0,
+      "aggregate_goodput_bps": 14638120.96,
+      "scheduler_ms": 0.0824,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 2332007,
+        "tx-3": 18462252,
+        "tx-4": 7596934
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 7759462.4,
+        "tx-3": 629145.6,
+        "tx-4": 6291456.0
+      },
+      "link_utilization": {
+        "access-1": 0.0,
+        "access-2": 0.6167,
+        "access-3": 0.05,
+        "core-bottleneck": 1.0,
+        "direct-link": 1.0
+      }
+    },
+    {
+      "time_s": 0.9,
+      "active_transfers": 3.0,
+      "aggregate_goodput_bps": 14638120.96,
+      "scheduler_ms": 0.0833,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 1559941,
+        "tx-3": 18399652,
+        "tx-4": 6967788
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 7759462.4,
+        "tx-3": 629145.6,
+        "tx-4": 6291456.0
+      },
+      "link_utilization": {
+        "access-1": 0.0,
+        "access-2": 0.6167,
+        "access-3": 0.05,
+        "core-bottleneck": 1.0,
+        "direct-link": 1.0
+      }
+    },
+    {
+      "time_s": 1.0,
+      "active_transfers": 3.0,
+      "aggregate_goodput_bps": 14638120.96,
+      "scheduler_ms": 0.0797,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 787874,
+        "tx-3": 18337052,
+        "tx-4": 6338642
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 7759462.4,
+        "tx-3": 629145.6,
+        "tx-4": 6291456.0
+      },
+      "link_utilization": {
+        "access-1": 0.0,
+        "access-2": 0.6167,
+        "access-3": 0.05,
+        "core-bottleneck": 1.0,
+        "direct-link": 1.0
+      }
+    },
+    {
+      "time_s": 1.1,
+      "active_transfers": 3.0,
+      "aggregate_goodput_bps": 14638120.96,
+      "scheduler_ms": 0.0775,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 15808,
+        "tx-3": 18274452,
+        "tx-4": 5709497
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 7759462.4,
+        "tx-3": 629145.6,
+        "tx-4": 6291456.0
+      },
+      "link_utilization": {
+        "access-1": 0.0,
+        "access-2": 0.6167,
+        "access-3": 0.05,
+        "core-bottleneck": 1.0,
+        "direct-link": 1.0
+      }
+    },
+    {
+      "time_s": 1.2,
+      "active_transfers": 2.0,
+      "aggregate_goodput_bps": 14170193.92,
+      "scheduler_ms": 0.083,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 17502385,
+        "tx-4": 5080351
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 7759462.4,
+        "tx-4": 6291456.0
+      },
+      "link_utilization": {
+        "access-1": 0.0,
+        "access-2": 0.0126,
+        "access-3": 0.6167,
+        "core-bottleneck": 0.9439,
+        "direct-link": 1.0
+      }
+    },
+    {
+      "time_s": 1.3,
+      "active_transfers": 2.0,
+      "aggregate_goodput_bps": 14638120.96,
+      "scheduler_ms": 0.1031,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 16667719,
+        "tx-4": 4451206
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 8388608.0,
+        "tx-4": 6291456.0
+      },
+      "link_utilization": {
+        "access-1": 0.0,
+        "access-2": 0.0,
+        "access-3": 0.6667,
+        "core-bottleneck": 1.0,
+        "direct-link": 1.0
+      }
+    },
+    {
+      "time_s": 1.4,
+      "active_transfers": 2.0,
+      "aggregate_goodput_bps": 14638120.96,
+      "scheduler_ms": 0.0673,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 15833052,
+        "tx-4": 3822060
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 8388608.0,
+        "tx-4": 6291456.0
+      },
+      "link_utilization": {
+        "access-1": 0.0,
+        "access-2": 0.0,
+        "access-3": 0.6667,
+        "core-bottleneck": 1.0,
+        "direct-link": 1.0
+      }
+    },
+    {
+      "time_s": 1.5,
+      "active_transfers": 2.0,
+      "aggregate_goodput_bps": 14638120.96,
+      "scheduler_ms": 0.0641,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 14998386,
+        "tx-4": 3192914
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 8388608.0,
+        "tx-4": 6291456.0
+      },
+      "link_utilization": {
+        "access-1": 0.0,
+        "access-2": 0.0,
+        "access-3": 0.6667,
+        "core-bottleneck": 1.0,
+        "direct-link": 1.0
+      }
+    },
+    {
+      "time_s": 1.6,
+      "active_transfers": 2.0,
+      "aggregate_goodput_bps": 14638120.96,
+      "scheduler_ms": 0.0648,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 14163719,
+        "tx-4": 2563769
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 8388608.0,
+        "tx-4": 6291456.0
+      },
+      "link_utilization": {
+        "access-1": 0.0,
+        "access-2": 0.0,
+        "access-3": 0.6667,
+        "core-bottleneck": 1.0,
+        "direct-link": 1.0
+      }
+    },
+    {
+      "time_s": 1.7,
+      "active_transfers": 2.0,
+      "aggregate_goodput_bps": 14638120.96,
+      "scheduler_ms": 0.064,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 13329053,
+        "tx-4": 1934623
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 8388608.0,
+        "tx-4": 6291456.0
+      },
+      "link_utilization": {
+        "access-1": 0.0,
+        "access-2": 0.0,
+        "access-3": 0.6667,
+        "core-bottleneck": 1.0,
+        "direct-link": 1.0
+      }
+    },
+    {
+      "time_s": 1.8,
+      "active_transfers": 2.0,
+      "aggregate_goodput_bps": 14638120.96,
+      "scheduler_ms": 0.062,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 12494386,
+        "tx-4": 1305478
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 8388608.0,
+        "tx-4": 6291456.0
+      },
+      "link_utilization": {
+        "access-1": 0.0,
+        "access-2": 0.0,
+        "access-3": 0.6667,
+        "core-bottleneck": 1.0,
+        "direct-link": 1.0
+      }
+    },
+    {
+      "time_s": 1.9,
+      "active_transfers": 2.0,
+      "aggregate_goodput_bps": 14638120.96,
+      "scheduler_ms": 0.0629,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 11659720,
+        "tx-4": 676332
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 8388608.0,
+        "tx-4": 6291456.0
+      },
+      "link_utilization": {
+        "access-1": 0.0,
+        "access-2": 0.0,
+        "access-3": 0.6667,
+        "core-bottleneck": 1.0,
+        "direct-link": 1.0
+      }
+    },
+    {
+      "time_s": 2.0,
+      "active_transfers": 2.0,
+      "aggregate_goodput_bps": 14638120.96,
+      "scheduler_ms": 0.0624,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 10825053,
+        "tx-4": 47186
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 8388608.0,
+        "tx-4": 6291456.0
+      },
+      "link_utilization": {
+        "access-1": 0.0,
+        "access-2": 0.0,
+        "access-3": 0.6667,
+        "core-bottleneck": 1.0,
+        "direct-link": 1.0
+      }
+    },
+    {
+      "time_s": 2.1,
+      "active_transfers": 1.0,
+      "aggregate_goodput_bps": 8818524.16,
+      "scheduler_ms": 0.0722,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 9990387,
+        "tx-4": 0
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 8388608.0,
+        "tx-4": 0.0
+      },
+      "link_utilization": {
+        "access-1": 0.0,
+        "access-2": 0.0,
+        "access-3": 0.6667,
+        "core-bottleneck": 1.0,
+        "direct-link": 0.075
+      }
+    },
+    {
+      "time_s": 2.2,
+      "active_transfers": 1.0,
+      "aggregate_goodput_bps": 8346664.96,
+      "scheduler_ms": 0.0528,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 9155720,
+        "tx-4": 0
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 8388608.0,
+        "tx-4": 0.0
+      },
+      "link_utilization": {
+        "access-1": 0.0,
+        "access-2": 0.0,
+        "access-3": 0.6667,
+        "core-bottleneck": 1.0,
+        "direct-link": 0.0
+      }
+    },
+    {
+      "time_s": 2.3,
+      "active_transfers": 1.0,
+      "aggregate_goodput_bps": 8346664.96,
+      "scheduler_ms": 0.0654,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 8321054,
+        "tx-4": 0
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 8388608.0,
+        "tx-4": 0.0
+      },
+      "link_utilization": {
+        "access-1": 0.0,
+        "access-2": 0.0,
+        "access-3": 0.6667,
+        "core-bottleneck": 1.0,
+        "direct-link": 0.0
+      }
+    },
+    {
+      "time_s": 2.4,
+      "active_transfers": 1.0,
+      "aggregate_goodput_bps": 8346664.96,
+      "scheduler_ms": 0.0474,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 7486387,
+        "tx-4": 0
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 8388608.0,
+        "tx-4": 0.0
+      },
+      "link_utilization": {
+        "access-1": 0.0,
+        "access-2": 0.0,
+        "access-3": 0.6667,
+        "core-bottleneck": 1.0,
+        "direct-link": 0.0
+      }
+    },
+    {
+      "time_s": 2.5,
+      "active_transfers": 1.0,
+      "aggregate_goodput_bps": 8346664.96,
+      "scheduler_ms": 0.0518,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 6651721,
+        "tx-4": 0
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 8388608.0,
+        "tx-4": 0.0
+      },
+      "link_utilization": {
+        "access-1": 0.0,
+        "access-2": 0.0,
+        "access-3": 0.6667,
+        "core-bottleneck": 1.0,
+        "direct-link": 0.0
+      }
+    },
+    {
+      "time_s": 2.6,
+      "active_transfers": 1.0,
+      "aggregate_goodput_bps": 8346664.96,
+      "scheduler_ms": 0.0478,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 5817055,
+        "tx-4": 0
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 8388608.0,
+        "tx-4": 0.0
+      },
+      "link_utilization": {
+        "access-1": 0.0,
+        "access-2": 0.0,
+        "access-3": 0.6667,
+        "core-bottleneck": 1.0,
+        "direct-link": 0.0
+      }
+    },
+    {
+      "time_s": 2.7,
+      "active_transfers": 1.0,
+      "aggregate_goodput_bps": 8346664.96,
+      "scheduler_ms": 0.0513,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 4982388,
+        "tx-4": 0
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 8388608.0,
+        "tx-4": 0.0
+      },
+      "link_utilization": {
+        "access-1": 0.0,
+        "access-2": 0.0,
+        "access-3": 0.6667,
+        "core-bottleneck": 1.0,
+        "direct-link": 0.0
+      }
+    },
+    {
+      "time_s": 2.8,
+      "active_transfers": 1.0,
+      "aggregate_goodput_bps": 8346664.96,
+      "scheduler_ms": 0.0467,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 4147722,
+        "tx-4": 0
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 8388608.0,
+        "tx-4": 0.0
+      },
+      "link_utilization": {
+        "access-1": 0.0,
+        "access-2": 0.0,
+        "access-3": 0.6667,
+        "core-bottleneck": 1.0,
+        "direct-link": 0.0
+      }
+    },
+    {
+      "time_s": 2.9,
+      "active_transfers": 1.0,
+      "aggregate_goodput_bps": 8346664.96,
+      "scheduler_ms": 0.0622,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 3313055,
+        "tx-4": 0
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 8388608.0,
+        "tx-4": 0.0
+      },
+      "link_utilization": {
+        "access-1": 0.0,
+        "access-2": 0.0,
+        "access-3": 0.6667,
+        "core-bottleneck": 1.0,
+        "direct-link": 0.0
+      }
+    },
+    {
+      "time_s": 3.0,
+      "active_transfers": 1.0,
+      "aggregate_goodput_bps": 8346664.96,
+      "scheduler_ms": 0.0505,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 2478389,
+        "tx-4": 0
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 8388608.0,
+        "tx-4": 0.0
+      },
+      "link_utilization": {
+        "access-1": 0.0,
+        "access-2": 0.0,
+        "access-3": 0.6667,
+        "core-bottleneck": 1.0,
+        "direct-link": 0.0
+      }
+    },
+    {
+      "time_s": 3.1,
+      "active_transfers": 1.0,
+      "aggregate_goodput_bps": 8346664.96,
+      "scheduler_ms": 0.0491,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 1643722,
+        "tx-4": 0
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 8388608.0,
+        "tx-4": 0.0
+      },
+      "link_utilization": {
+        "access-1": 0.0,
+        "access-2": 0.0,
+        "access-3": 0.6667,
+        "core-bottleneck": 1.0,
+        "direct-link": 0.0
+      }
+    },
+    {
+      "time_s": 3.2,
+      "active_transfers": 1.0,
+      "aggregate_goodput_bps": 8346664.96,
+      "scheduler_ms": 0.0493,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 809056,
+        "tx-4": 0
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 8388608.0,
+        "tx-4": 0.0
+      },
+      "link_utilization": {
+        "access-1": 0.0,
+        "access-2": 0.0,
+        "access-3": 0.6667,
+        "core-bottleneck": 1.0,
+        "direct-link": 0.0
+      }
+    },
+    {
+      "time_s": 3.3,
+      "active_transfers": 1.0,
+      "aggregate_goodput_bps": 5571084.29,
+      "scheduler_ms": 0.049,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 251947,
+        "tx-4": 0
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 8388608.0,
+        "tx-4": 0.0
+      },
+      "link_utilization": {
+        "access-1": 0.0,
+        "access-2": 0.0,
+        "access-3": 0.445,
+        "core-bottleneck": 0.6675,
+        "direct-link": 0.0
+      }
+    },
+    {
+      "time_s": 3.4,
+      "active_transfers": 0.0,
+      "aggregate_goodput_bps": 2519465.98,
+      "scheduler_ms": 0.0523,
+      "remaining_bytes": {
+        "tx-1": 0,
+        "tx-2": 0,
+        "tx-3": 0,
+        "tx-4": 0
+      },
+      "allocated_bps": {
+        "tx-1": 0.0,
+        "tx-2": 0.0,
+        "tx-3": 0.0,
+        "tx-4": 0.0
+      },
+      "link_utilization": {
+        "access-1": 0.0,
+        "access-2": 0.0,
+        "access-3": 0.2012,
+        "core-bottleneck": 0.3019,
+        "direct-link": 0.0
+      }
+    }
+  ]
+}

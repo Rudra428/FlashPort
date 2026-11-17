@@ -1,255 +1,135 @@
-# FlashPort
+# FlowWeave — Cooperative Bidirectional File-Transfer Scheduling System
 
-**FlashPort — Intelligent, Cooperative Scheduling for Concurrent File Transfers** is a
-Computer Networks demonstration project. It combines an existing reproducible scheduler
-simulator with a real, local HTTP file server and resumable asynchronous client.
+**FlowWeave** is a cooperative, congestion-aware, bidirectional (upload + download) file-transfer scheduling system built in Python (`FastAPI`, `asyncio`, `aiohttp`, `SimPy`, `NumPy`, `SQLite`) and React (`TypeScript`, `Vite`, `Chart.js`).
 
-## Problem and motivation
+Instead of letting simultaneous uploads and downloads compete blindly for shared bandwidth, FlowWeave monitors active transfers across both directions, separates directly observed measurements from smoothed estimates, and coordinates link placement and bandwidth allocation to minimize aggregate flow completion time:
 
-When several files share a limited outgoing link, equal sharing can delay short files,
-while aggressively prioritizing short files can make large files wait. FlashPort exposes
-four policies and measures their trade-offs instead of assuming one policy is universally
-best. Its application scheduler shapes the server's own outgoing byte stream; it does not
-control TCP internals, routers, or Internet congestion.
+$$\min \sum_{i=1}^{N} T_i$$
 
-## Features
+while protecting fairness, tail completion time ($P_{95}$), aggregate goodput, and bounded redundant transmissions.
 
-- Independent, Equal Share, SRPT, and FlashPort scheduling policies.
-- An asyncio/FastAPI server for safe file listing, metadata, single HTTP byte ranges,
-  transfer status, cancellation, and per-transfer scheduling.
-- Browser drag-and-drop/upload, live receiver registration, multi-recipient delivery, and
-  per-receiver progress with SHA-256 verification.
-- A token bucket per logical transfer, shared across every concurrent range request for
-  that transfer; allocations across active transfers are bounded by configured capacity.
-- An aiohttp client supporting concurrent files/chunks, resume manifests, retries, safe
-  partial-file writes, and final SHA-256 verification.
-- A focused file-sharing dashboard; simulation and benchmark APIs remain available separately.
-- Client-reported goodput/progress, server stream-byte counters, HTTP request-latency
-  samples, verified completion-time metrics, and explicit unavailable transport metrics.
-- Reproducible simulation scenarios, benchmark CSV/JSON, report, and charts.
-- Optional Linux `tc/netem` command generation. FlashPort does not execute privileged
-  commands or alter host network settings.
+---
 
-There are no machine-learning components in the inspected repository. No existing ML
-policy was removed.
+## Quick Start
 
-## Architecture
-
-```text
-Client (aiohttp; concurrent byte ranges; resume + SHA-256)
-                         |
-                  HTTP / Range
-                         v
-FastAPI API -> safe shared-file resolver -> transfer manager
-                                              |
-                                  selected scheduler (250 ms)
-                                              |
-                             one token bucket per transfer ID
-                                              |
-                                  async bounded file streaming
-
-Dashboard -> actual transfer/status/network endpoints
-          -> simulation endpoint + stored benchmark CSV/JSON/graphs
-```
-
-The simulation engine and live transfer manager are separate. See
-[docs/architecture.md](docs/architecture.md), [docs/network_model.md](docs/network_model.md),
-and [docs/algorithm.md](docs/algorithm.md) for diagrams and details.
-
-## Technology
-
-- Python 3.11+
-- FastAPI and Uvicorn
-- aiohttp and Python asyncio
-- pytest / pytest-asyncio
-- matplotlib, NumPy, and pandas for experiment/report tooling
-
-## Installation
-
-From the project directory, on Windows PowerShell:
-
-```powershell
-py -3.11 -m venv .venv
-.\.venv\Scripts\Activate.ps1
-python -m pip install -r requirements.txt
-```
-
-On Linux/macOS:
+### 1. Install Python Backend Dependencies
 
 ```bash
-python3 -m venv .venv
+python -m venv .venv
+# Windows:
+.venv\Scripts\activate
+# Linux / macOS:
 source .venv/bin/activate
-python -m pip install -r requirements.txt
+
+pip install -r requirements.txt
 ```
 
-Generate deterministic demonstration files (1 MB, 8 MB, and empty):
+### 2. Build Frontend Dashboard (Already Built in `frontend/dist/`)
 
 ```bash
-python scripts/create_demo_files.py
+cd frontend
+npm install
+npm run build
+cd ..
 ```
 
-The server serves direct files from `shared/` by default. Change the directory with
-`--shared-dir` or the `FLASHPORT_SHARED_DIR` environment variable.
-
-## Start the server and dashboard
+### 3. Start FlowWeave Locally
 
 ```bash
-python -m flashport.cli serve --host 127.0.0.1 --port 8000 `
-  --shared-dir shared --capacity-bps 20000000 --scheduler flashport
+# Single command serves BOTH the FastAPI REST API and the built React Dashboard + embedded HTTP Range/Upload demo server:
+python -m flowweave serve --host 127.0.0.1 --port 8080
 ```
 
-The backtick above is PowerShell line continuation. Run it on one line if preferred.
-Open [http://127.0.0.1:8000](http://127.0.0.1:8000); interactive API documentation is
-at [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs).
+Open:
+- **Dashboard UI**: `http://127.0.0.1:8080`
+- **Interactive API Docs (Swagger / OpenAPI)**: `http://127.0.0.1:8080/docs`
 
-For a direct Uvicorn launch:
+*(Optional: for hot-reload frontend development, run `npm --prefix frontend run dev` alongside FastAPI on port `8000`.)*
+
+---
+
+## Demonstration Walkthrough (No External Internet Required)
+
+Sample binary files are provisioned automatically in `sample_files/` (`patch_512kb.bin`, `dataset_1mb.bin`, `archive_2mb.bin`, `checkpoint_4mb.bin`, `video_6mb.bin`, `demo_notes.txt`), backed by an embedded local `aiohttp` HTTP Range + Chunked Upload server:
+
+1. Open **Overview** → adjust Downlink/Uplink caps (e.g., `3 MB/s` down, `2 MB/s` up) → click **Run Mixed Upload + Download Demo** to watch 4 concurrent downloads + 3 concurrent uploads execute simultaneously.
+2. Open **All Transfers** to inspect unified bidirectional progress, worker counts, measured speeds, and test live **Pause / Resume / Cancel**.
+3. Open **Uploads** to select real files from your laptop (`<input type="file">`) or sample files; each upload is split into parallel chunks, paced by the scheduler, reassembled, SHA-256 verified, and atomically committed to `uploads/`.
+4. Open **Downloads** to test HTTP Range parallel downloads or the `/noranges/` single-stream fallback file.
+5. Open **Network Monitor** to inspect separate Upload vs Download throughput charts, link utilization, congestion status, measured vs estimated EWMA rates, and straggler alerts.
+6. Open **Scheduler** to switch policies live (`Independent`, `Max-Min Fair`, `SRPT`, `FlowWeave`) and inspect the live **Coordinator Decision Log**.
+7. Open **Experiments** to run reproducible 4-policy SimPy comparisons across 9 scenarios (including `bidirectional_mixed`, `partially_shared_paths`, `independent_paths`, `dynamic_bandwidth_drop`, and `straggler_recovery`) with Chart.js visualizations clearly labeled as simulated fluid-flow results.
+
+---
+
+## Running Tests & Benchmarks
 
 ```bash
-python -m uvicorn flashport.api.main:app --host 127.0.0.1 --port 8000
+# Run complete test suite (39 tests: unit, analytical simulator, bidirectional uploads/downloads, API)
+pytest -v
+
+# Run reproducible 9-scenario + scalability simulation benchmark and generate PNG charts
+python -m flowweave benchmark --out results --seed 42
+
+# Run live HTTP Range 4-policy benchmark against local server
+python -m flowweave live-benchmark --rate-mbit 24 --out results/live_comparison.json
+
+# Generate Linux tc (tbf+netem) + iperf3 validation script
+python -m flowweave netem-script --out scripts/run_tc_experiment.sh
 ```
 
-Use one server worker: the transfer registry and shared-capacity token buckets are
-in-memory and process-local. The default binds only to localhost. Do not expose this
-unauthenticated academic demo to an untrusted network; file listing and scheduler selection
-are intentionally local-demo controls.
+---
 
-## Share files from the browser
+## REST API Summary
 
-Open the dashboard on each receiver device, enter a device name under **Receive on this
-device**, and choose **Register device**. Keep that page open while receiving. On the
-sender's page, drop or browse for a file, select one or more online receivers, and choose
-**Send file**. The browser uploads the file to the server, which queues an actual
-scheduler-limited transfer for each selected receiver. Receivers download and verify the
-file's SHA-256; the sender's Transfers panel shows individual progress and completion.
-Browser uploads are limited to 1 GB and are stored under `shared/.flashport-uploads/`.
+| Method & Endpoint | Description |
+|---|---|
+| `GET /api/health` | Service status, active policy, demo server port, sample files |
+| `GET /api/transfers` | List all active & completed uploads and downloads |
+| `POST /api/transfers/download` | Start an HTTP download (Range chunking + single-stream fallback) |
+| `POST /api/transfers/upload` | Start a chunked parallel upload of a local/sample file |
+| `POST /api/transfers/upload-browser` | Upload a browser-selected file through the chunked FlowWeave engine |
+| `GET /api/transfers/{id}` | Inspect one transfer's measured & estimated telemetry |
+| `POST /api/transfers/{id}/pause` | Pause an active upload or download |
+| `POST /api/transfers/{id}/resume` | Resume a paused upload or download |
+| `POST /api/transfers/{id}/cancel` | Cancel an active/paused transfer |
+| `GET /api/monitor` | Live bidirectional throughput, links, congestion, stragglers, decision log |
+| `GET /api/scheduler` & `POST /api/scheduler` | View or hot-switch scheduling policy and link capacities |
+| `GET /api/demo/files` & `POST /api/demo/start` | List sample files and launch `downloads`, `uploads`, or `mixed` demo batches |
+| `GET /api/experiments/scenarios` | List all 9 built-in simulation scenarios |
+| `POST /api/experiments/run` & `GET /api/experiments/results` | Execute 4-policy simulation comparison and retrieve SQLite history |
 
-The default server address is reachable only from the same computer. For testing on a
-trusted local network, start the server with `--host 0.0.0.0`, then open
-`http://<server-private-IP>:8000` on each device (allow the port through the host firewall
-if needed). This demo has no user authentication or TLS, so do not expose it to untrusted
-networks or the public Internet.
+---
 
-## Start clients and demonstrate concurrent transfers
+## Project Structure
 
-List the server's files:
+- `flowweave/models.py`, `config.py`, `metrics.py`, `storage.py`, `demo.py` — Unified bidirectional domain models, metrics, SQLite persistence, and sample file provisioning.
+- `flowweave/simulator/` — SimPy directed-graph fluid-flow simulator enforcing $\sum_{i: j \in P_i} b_i(t) \le C_j$ across single-hop, multi-hop, full-duplex, and shared links, plus 9 reproducible scenarios and Matplotlib plotting.
+- `flowweave/scheduler/` — Common `Scheduler` interface with 4 policies (`independent`, `max_min`, `srpt`, `flowweave`) + multi-hop capacity validator.
+- `flowweave/monitor/` — Rolling-window + EWMA network monitor separating measured statistics from derived estimates.
+- `flowweave/straggler/` — Cost-benefit straggler detector and replication planner.
+- `flowweave/transfer/` — Real `aiohttp` Range download engine, chunked resumable upload client & server (`ChunkedUploadStore` with path-traversal protection and atomic finalization), live `AsyncRateLimiter`, unified `TransferManager`, and local demo server.
+- `flowweave/coordinator.py` — Periodic `asyncio` control loop with allocation validation and rationale logging.
+- `flowweave/api/app.py` — FastAPI REST backend serving both `/api/*` and the built React dashboard.
+- `frontend/` — 7-section React + TypeScript + Vite + Chart.js dashboard.
+- `docs/` — [architecture.md](docs/architecture.md), [algorithm.md](docs/algorithm.md).
+- `results/` — [experiment_report.md](results/experiment_report.md), CSV/JSON outputs, and Matplotlib comparison & per-scenario telemetry charts.
 
-```bash
-python -m flashport.cli list --server http://127.0.0.1:8000
-```
+---
 
-Download two different files concurrently from one client:
+## Completed vs Known Limitations
 
-```bash
-python -m flashport.cli download --server http://127.0.0.1:8000 `
-  --destination downloads\client-a --chunk-size 262144 --connections 4 `
-  demo-1mb.bin demo-8mb.bin
-```
+### Completed & Verified
+- Bidirectional real HTTP transfers (parallel Range downloads with single-stream fallback; parallel chunked resumable uploads with atomic commit, ownership/boundary/path-traversal validation, retries, SHA-256 verification, and Pause/Resume/Cancel).
+- Directed-graph multi-hop SimPy simulator with strict per-link capacity enforcement, analytical tests, full-duplex uplink/downlink modeling, dynamic capacity/loss events, and JSON/CSV/Matplotlib export.
+- All 4 scheduling policies (`independent`, `max_min`, `srpt`, `flowweave`) with live policy switching and coordinator rationale logs.
+- Cost-benefit straggler detection and simulation-level speculative replication.
+- Full 7-section React + Chart.js dashboard backed exclusively by real FastAPI responses.
+- 39 automated pytest tests passing + 9-scenario reproducible benchmark suite.
 
-In another terminal, run a second client at the same time:
-
-```bash
-python -m flashport.cli download --server http://127.0.0.1:8000 `
-  --destination downloads\client-b --connections 3 demo-8mb.bin
-```
-
-Each client reports progress; completed downloads are renamed from their `.part` file only
-after the whole-file SHA-256 matches. To change the client behavior, try `--chunk-size`,
-`--connections`, `--retries`, `--overwrite`, or `--no-resume`. The client concurrency
-setting limits range requests for that client instance. The server applies the policy
-allocation to each logical transfer, not each range connection.
-
-If a client is interrupted, rerun the same download with the same destination and chunk
-size. The client resumes its verified chunks and reuses the logical server transfer while
-the server process is alive. After a server restart, the client validates local chunk hashes
-against the shared source before resuming under a new server-side transfer ID.
-
-## Scheduler selection and monitoring
-
-Choose a default policy on server startup with `--scheduler` (`independent`, `equal_share`,
-`srpt`, or `flashport`). While running, change the policy and configured application capacity
-with `POST /api/scheduler`. The API also supports:
-
-```text
-GET  /api/scheduler
-POST /api/scheduler
-GET  /api/transfers
-GET  /api/transfers/{transfer_id}/status   (requires X-FlashPort-Token)
-GET  /api/network/metrics
-```
-
-Allocation values are configured sending rates. Actual goodput is measured by client
-progress reports and may differ because of TCP, host scheduling, disk I/O, and network
-conditions. HTTP request latency includes application/server delay and is not a pure RTT.
-Packet loss and TCP retransmission counters are not available in this app-only monitor.
-
-## Simulation and reproducible benchmarks
-
-Run the interactive fixed workload comparison:
-
-```bash
-python -m flashport.simulation.experiments
-```
-
-This writes scenario/policy CSV, per-transfer CSV, JSON, a Markdown report, and five charts
-under `results/`. It does not transfer files. The `/api/simulation/comparison` endpoint and
-benchmark artifact routes remain available; the main dashboard is focused on actual file
-sharing rather than charts or analytics.
-
-The latest stored benchmark report is [results/benchmark_report.md](results/benchmark_report.md).
-It records that SRPT had lower mean FCT than FlashPort in 14/14 scenarios, while FlashPort
-beat or tied Equal Share in all 14 (7 wins, 7 ties). Interpret those results only under the
-documented single-bottleneck simulator assumptions; actual live runs are not benchmark
-claims.
-
-## Tests
-
-```bash
-python -m pytest -q
-```
-
-Tests cover the existing simulation and policies plus receiver registration, browser upload
-and multi-receiver delivery, HTTP paths/ranges, transfer tokens, complete-byte-range checks,
-concurrent clients/chunks, resumable downloads, integrity, rate-budget sharing, cancellation,
-empty files, and API/dashboard integration.
-
-## HTTP API overview
-
-- `GET /health`
-- `POST /api/uploads?filename=...` (raw file body; maximum 1 GB)
-- `GET|POST /api/receivers`; receiver heartbeat, unregister, and queued-delivery routes
-- `POST /api/deliveries`; `GET /api/deliveries/{id}` for per-receiver progress
-- `GET /api/files`
-- `GET /api/files/{filename}/metadata`
-- `POST /api/transfers`
-- `GET /api/transfers`
-- `GET /api/transfers/{id}/content` with one `Range: bytes=start-end` and transfer token
-- `PUT /api/transfers/{id}/resume`, `/progress`
-- `GET /api/transfers/{id}/status`, `POST /complete`, `/cancel`
-- `GET|POST /api/scheduler`
-- `GET /api/network/metrics`
-- `GET /api/simulation/comparison`
-- `GET /api/benchmarks`
-
-Unsupported or malformed ranges return 416; missing files return 404; path traversal and
-invalid inputs return explicit 4xx responses. Transfer IDs use random bearer tokens for
-range/progress/status control. Resume manifests are stored beside local `.part` files and
-contain that token; protect the destination directory accordingly.
-
-## Limitations
-
-- One Uvicorn worker/process; live state is in memory and is reset on server restart.
-- The default shared directory is served only at its top level. This is a local demo, not
-  a hardened public file-hosting service; it has no user-account authentication/TLS setup.
-- A single byte range is supported per HTTP response. Multipart ranges are rejected.
-- Application token buckets shape bytes yielded by the server; they do not guarantee
-  physical-link capacity or control TCP/network behavior.
-- Actual latency is HTTP request latency, not raw network RTT. Packet loss and retransmits
-  need OS-level tools and are not currently collected.
-- `tc/netem` support only generates reviewed Linux commands. Applying or removing them
-  requires the user's explicit manual approval and appropriate privileges.
-- The Independent policy is an Equal Share approximation in the simulator, not a TCP
-  implementation. FlashPort is a heuristic, not proven optimal or novel.
-
-See [docs/limitations.md](docs/limitations.md), [docs/experiments.md](docs/experiments.md),
-[docs/viva_questions.md](docs/viva_questions.md), and
-[docs/project_presentation.md](docs/project_presentation.md) for viva/presentation material.
+### Known Limitations
+- **Fluid-flow simulator (not packet-level TCP)**: The SimPy simulator models bandwidth sharing, RTT startup, packet loss goodput tax, and oversubscription penalties at fluid-flow tick granularity (`0.1s`); it does not emulate TCP CUBIC/BBR congestion windows, packet reordering, or router AQM queues.
+- **Real-world bottleneck enforcement requires OS shaping**: On local loopback without Linux `tc` (`scripts/run_tc_experiment.sh`), the OS kernel imposes no physical bottleneck on `independent` flows, whereas coordinated policies (`max_min`, `srpt`, `flowweave`) obey their configured token-bucket limits.
+- **Speculative replication in live HTTP engine**: Enabled and evaluated in simulation, but disabled by default (`allow_real_replication = False`) in the live HTTP engine to prevent unintended duplicate WAN traffic when single-origin URLs are used.
+- **Upload server persistence**: Upload session metadata is held in memory within `ChunkedUploadStore` (staging files are on disk); restarting the server mid-upload requires starting a fresh upload session.
+- **Prior-art honesty**: FlowWeave combines established techniques (SRPT, max-min water-filling, marginal batch-delay routing, starvation aging, and cost-benefit hedged replication) into a unified prototype and does not claim algorithmic novelty.

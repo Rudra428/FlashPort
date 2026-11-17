@@ -1,0 +1,2 @@
+FlowWeave demonstration sample file.
+Used for testing real chunked uploads, HTTP Range downloads, and SHA-256 verification.

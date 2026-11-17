@@ -1,0 +1,949 @@
+{
+  "is_simulated": true,
+  "summary": {
+    "scenario": "bidirectional_mixed",
+    "policy": "flowweave",
+    "seed": 42,
+    "is_simulated": true,
+    "num_transfers": 6,
+    "completed_transfers": 6,
+    "avg_fct_s": 1.2,
+    "sum_fct_s": 7.2,
+    "p95_fct_s": 2.725,
+    "makespan_s": 3.1,
+    "aggregate_goodput_bps": 11669636.13,
+    "jains_fairness": 0.9483,
+    "redundant_bytes": 181789,
+    "redundant_ratio": 0.005,
+    "scheduler_overhead_ms_total": 1.4867,
+    "scheduler_overhead_ms_avg": 0.048,
+    "replications_triggered": 0,
+    "replications_won": 0,
+    "outcomes": [
+      {
+        "transfer_id": "dl-1",
+        "filename": "dl_patch_1MB.bin",
+        "size_bytes": 1048576,
+        "arrival_time": 0.0,
+        "start_time": 0,
+        "completion_time": 0.30000000000000004,
+        "fct_s": 0.30000000000000004,
+        "avg_goodput_bps": 3495253.333333333,
+        "direction": "download",
+        "redundant_bytes": 5269,
+        "retries": 0,
+        "state": "completed"
+      },
+      {
+        "transfer_id": "dl-2",
+        "filename": "dl_model_4MB.bin",
+        "size_bytes": 4194304,
+        "arrival_time": 0.0,
+        "start_time": 0,
+        "completion_time": 0.8999999999999999,
+        "fct_s": 0.8999999999999999,
+        "avg_goodput_bps": 4660337.777777778,
+        "direction": "download",
+        "redundant_bytes": 21077,
+        "retries": 0,
+        "state": "completed"
+      },
+      {
+        "transfer_id": "dl-3",
+        "filename": "dl_archive_16MB.bin",
+        "size_bytes": 16777216,
+        "arrival_time": 0.2,
+        "start_time": 0.2,
+        "completion_time": 3.1000000000000014,
+        "fct_s": 2.9000000000000012,
+        "avg_goodput_bps": 5785246.896551722,
+        "direction": "download",
+        "redundant_bytes": 84308,
+        "retries": 0,
+        "state": "completed"
+      },
+      {
+        "transfer_id": "ul-1",
+        "filename": "ul_report_512KB.bin",
+        "size_bytes": 524288,
+        "arrival_time": 0.0,
+        "start_time": 0,
+        "completion_time": 0.2,
+        "fct_s": 0.2,
+        "avg_goodput_bps": 2621440.0,
+        "direction": "upload",
+        "redundant_bytes": 2635,
+        "retries": 0,
+        "state": "completed"
+      },
+      {
+        "transfer_id": "ul-2",
+        "filename": "ul_dataset_3MB.bin",
+        "size_bytes": 3145728,
+        "arrival_time": 0.0,
+        "start_time": 0,
+        "completion_time": 0.7,
+        "fct_s": 0.7,
+        "avg_goodput_bps": 4493897.142857143,
+        "direction": "upload",
+        "redundant_bytes": 15808,
+        "retries": 0,
+        "state": "completed"
+      },
+      {
+        "transfer_id": "ul-3",
+        "filename": "ul_backup_10MB.bin",
+        "size_bytes": 10485760,
+        "arrival_time": 0.3,
+        "start_time": 0.3,
+        "completion_time": 2.500000000000001,
+        "fct_s": 2.200000000000001,
+        "avg_goodput_bps": 4766254.545454543,
+        "direction": "upload",
+        "redundant_bytes": 52692,
+        "retries": 0,
+        "state": "completed"
+      }
+    ]
+  },
+  "capacity_violations": 0,
+  "timeline": [
+    {
+      "time_s": 0.1,
+      "active_transfers": 4.0,
+      "aggregate_goodput_bps": 10368188.42,
+      "scheduler_ms": 0.0919,
+      "remaining_bytes": {
+        "dl-1": 556384,
+        "dl-2": 4154397,
+        "dl-3": 16777216,
+        "ul-1": 59477,
+        "ul-2": 3105821,
+        "ul-3": 10485760
+      },
+      "allocated_bps": {
+        "dl-1": 5819596.8,
+        "dl-2": 471859.2,
+        "dl-3": 0.0,
+        "ul-1": 5819596.8,
+        "ul-2": 471859.2,
+        "ul-3": 0.0
+      },
+      "link_utilization": {
+        "wan-downlink": 0.51,
+        "wan-uplink": 0.8063,
+        "isp-shared": 0.8281
+      }
+    },
+    {
+      "time_s": 0.2,
+      "active_transfers": 4.0,
+      "aggregate_goodput_bps": 11598615.91,
+      "scheduler_ms": 0.0659,
+      "remaining_bytes": {
+        "dl-1": 3300,
+        "dl-2": 4107447,
+        "dl-3": 16777216,
+        "ul-1": 0,
+        "ul-2": 2605470,
+        "ul-3": 10485760
+      },
+      "allocated_bps": {
+        "dl-1": 6398416.0,
+        "dl-2": 471859.2,
+        "dl-3": 0.0,
+        "ul-1": 0.0,
+        "ul-2": 5028651.3,
+        "ul-3": 0.0
+      },
+      "link_utilization": {
+        "wan-downlink": 0.5751,
+        "wan-uplink": 0.8943,
+        "isp-shared": 0.9264
+      }
+    },
+    {
+      "time_s": 0.3,
+      "active_transfers": 4.0,
+      "aggregate_goodput_bps": 12013066.0,
+      "scheduler_ms": 0.0608,
+      "remaining_bytes": {
+        "dl-1": 0,
+        "dl-2": 3575347,
+        "dl-3": 16737309,
+        "ul-1": 0,
+        "ul-2": 1979470,
+        "ul-3": 10485760
+      },
+      "allocated_bps": {
+        "dl-1": 0.0,
+        "dl-2": 5347737.6,
+        "dl-3": 471859.2,
+        "ul-1": 0.0,
+        "ul-2": 6291456.0,
+        "ul-3": 0.0
+      },
+      "link_utilization": {
+        "wan-downlink": 0.5514,
+        "wan-uplink": 1.0,
+        "isp-shared": 0.9595
+      }
+    },
+    {
+      "time_s": 0.4,
+      "active_transfers": 4.0,
+      "aggregate_goodput_bps": 12449572.45,
+      "scheduler_ms": 0.058,
+      "remaining_bytes": {
+        "dl-1": 0,
+        "dl-2": 2996297,
+        "dl-3": 16690359,
+        "ul-1": 0,
+        "ul-2": 1400420,
+        "ul-3": 10445853
+      },
+      "allocated_bps": {
+        "dl-1": 0.0,
+        "dl-2": 5819596.8,
+        "dl-3": 471859.2,
+        "ul-1": 0.0,
+        "ul-2": 5819596.8,
+        "ul-3": 471859.2
+      },
+      "link_utilization": {
+        "wan-downlink": 0.6,
+        "wan-uplink": 0.9888,
+        "isp-shared": 0.9944
+      }
+    },
+    {
+      "time_s": 0.5,
+      "active_transfers": 4.0,
+      "aggregate_goodput_bps": 12519997.44,
+      "scheduler_ms": 0.0542,
+      "remaining_bytes": {
+        "dl-1": 0,
+        "dl-2": 2417247,
+        "dl-3": 16643409,
+        "ul-1": 0,
+        "ul-2": 821371,
+        "ul-3": 10398903
+      },
+      "allocated_bps": {
+        "dl-1": 0.0,
+        "dl-2": 5819596.8,
+        "dl-3": 471859.2,
+        "ul-1": 0.0,
+        "ul-2": 5819596.8,
+        "ul-3": 471859.2
+      },
+      "link_utilization": {
+        "wan-downlink": 0.6,
+        "wan-uplink": 1.0,
+        "isp-shared": 1.0
+      }
+    },
+    {
+      "time_s": 0.6,
+      "active_transfers": 4.0,
+      "aggregate_goodput_bps": 12519997.44,
+      "scheduler_ms": 0.052,
+      "remaining_bytes": {
+        "dl-1": 0,
+        "dl-2": 1838197,
+        "dl-3": 16596459,
+        "ul-1": 0,
+        "ul-2": 242321,
+        "ul-3": 10351953
+      },
+      "allocated_bps": {
+        "dl-1": 0.0,
+        "dl-2": 5819596.8,
+        "dl-3": 471859.2,
+        "ul-1": 0.0,
+        "ul-2": 5819596.8,
+        "ul-3": 471859.2
+      },
+      "link_utilization": {
+        "wan-downlink": 0.6,
+        "wan-uplink": 1.0,
+        "isp-shared": 1.0
+      }
+    },
+    {
+      "time_s": 0.7,
+      "active_transfers": 3.0,
+      "aggregate_goodput_bps": 12170441.27,
+      "scheduler_ms": 0.0645,
+      "remaining_bytes": {
+        "dl-1": 0,
+        "dl-2": 957374,
+        "dl-3": 16549509,
+        "ul-1": 0,
+        "ul-2": 0,
+        "ul-3": 10305003
+      },
+      "allocated_bps": {
+        "dl-1": 0.0,
+        "dl-2": 8852502.1,
+        "dl-3": 471859.2,
+        "ul-1": 0.0,
+        "ul-2": 0.0,
+        "ul-3": 471859.2
+      },
+      "link_utilization": {
+        "wan-downlink": 0.8892,
+        "wan-uplink": 0.4621,
+        "isp-shared": 0.9721
+      }
+    },
+    {
+      "time_s": 0.8,
+      "active_transfers": 3.0,
+      "aggregate_goodput_bps": 9746544.4,
+      "scheduler_ms": 0.0496,
+      "remaining_bytes": {
+        "dl-1": 0,
+        "dl-2": 253986,
+        "dl-3": 16486909,
+        "ul-1": 0,
+        "ul-2": 0,
+        "ul-3": 10096336
+      },
+      "allocated_bps": {
+        "dl-1": 0.0,
+        "dl-2": 9856614.4,
+        "dl-3": 629145.6,
+        "ul-1": 0.0,
+        "ul-2": 0.0,
+        "ul-3": 2097152.0
+      },
+      "link_utilization": {
+        "wan-downlink": 0.7342,
+        "wan-uplink": 0.3333,
+        "isp-shared": 0.7785
+      }
+    },
+    {
+      "time_s": 0.9,
+      "active_transfers": 2.0,
+      "aggregate_goodput_bps": 12153614.58,
+      "scheduler_ms": 0.0487,
+      "remaining_bytes": {
+        "dl-1": 0,
+        "dl-2": 0,
+        "dl-3": 16151533,
+        "ul-1": 0,
+        "ul-2": 0,
+        "ul-3": 9470337
+      },
+      "allocated_bps": {
+        "dl-1": 0.0,
+        "dl-2": 0.0,
+        "dl-3": 3370617.0,
+        "ul-1": 0.0,
+        "ul-2": 0.0,
+        "ul-3": 6291456.0
+      },
+      "link_utilization": {
+        "wan-downlink": 0.5649,
+        "wan-uplink": 1.0,
+        "isp-shared": 0.9707
+      }
+    },
+    {
+      "time_s": 1.0,
+      "active_transfers": 2.0,
+      "aggregate_goodput_bps": 12519997.44,
+      "scheduler_ms": 0.0425,
+      "remaining_bytes": {
+        "dl-1": 0,
+        "dl-2": 0,
+        "dl-3": 15525533,
+        "ul-1": 0,
+        "ul-2": 0,
+        "ul-3": 8844337
+      },
+      "allocated_bps": {
+        "dl-1": 0.0,
+        "dl-2": 0.0,
+        "dl-3": 6291456.0,
+        "ul-1": 0.0,
+        "ul-2": 0.0,
+        "ul-3": 6291456.0
+      },
+      "link_utilization": {
+        "wan-downlink": 0.6,
+        "wan-uplink": 1.0,
+        "isp-shared": 1.0
+      }
+    },
+    {
+      "time_s": 1.1,
+      "active_transfers": 2.0,
+      "aggregate_goodput_bps": 12519997.44,
+      "scheduler_ms": 0.0413,
+      "remaining_bytes": {
+        "dl-1": 0,
+        "dl-2": 0,
+        "dl-3": 14899533,
+        "ul-1": 0,
+        "ul-2": 0,
+        "ul-3": 8218337
+      },
+      "allocated_bps": {
+        "dl-1": 0.0,
+        "dl-2": 0.0,
+        "dl-3": 6291456.0,
+        "ul-1": 0.0,
+        "ul-2": 0.0,
+        "ul-3": 6291456.0
+      },
+      "link_utilization": {
+        "wan-downlink": 0.6,
+        "wan-uplink": 1.0,
+        "isp-shared": 1.0
+      }
+    },
+    {
+      "time_s": 1.2,
+      "active_transfers": 2.0,
+      "aggregate_goodput_bps": 12519997.44,
+      "scheduler_ms": 0.0693,
+      "remaining_bytes": {
+        "dl-1": 0,
+        "dl-2": 0,
+        "dl-3": 14273533,
+        "ul-1": 0,
+        "ul-2": 0,
+        "ul-3": 7592337
+      },
+      "allocated_bps": {
+        "dl-1": 0.0,
+        "dl-2": 0.0,
+        "dl-3": 6291456.0,
+        "ul-1": 0.0,
+        "ul-2": 0.0,
+        "ul-3": 6291456.0
+      },
+      "link_utilization": {
+        "wan-downlink": 0.6,
+        "wan-uplink": 1.0,
+        "isp-shared": 1.0
+      }
+    },
+    {
+      "time_s": 1.3,
+      "active_transfers": 2.0,
+      "aggregate_goodput_bps": 12519997.44,
+      "scheduler_ms": 0.0602,
+      "remaining_bytes": {
+        "dl-1": 0,
+        "dl-2": 0,
+        "dl-3": 13647533,
+        "ul-1": 0,
+        "ul-2": 0,
+        "ul-3": 6966337
+      },
+      "allocated_bps": {
+        "dl-1": 0.0,
+        "dl-2": 0.0,
+        "dl-3": 6291456.0,
+        "ul-1": 0.0,
+        "ul-2": 0.0,
+        "ul-3": 6291456.0
+      },
+      "link_utilization": {
+        "wan-downlink": 0.6,
+        "wan-uplink": 1.0,
+        "isp-shared": 1.0
+      }
+    },
+    {
+      "time_s": 1.4,
+      "active_transfers": 2.0,
+      "aggregate_goodput_bps": 12519997.44,
+      "scheduler_ms": 0.0625,
+      "remaining_bytes": {
+        "dl-1": 0,
+        "dl-2": 0,
+        "dl-3": 13021533,
+        "ul-1": 0,
+        "ul-2": 0,
+        "ul-3": 6340337
+      },
+      "allocated_bps": {
+        "dl-1": 0.0,
+        "dl-2": 0.0,
+        "dl-3": 6291456.0,
+        "ul-1": 0.0,
+        "ul-2": 0.0,
+        "ul-3": 6291456.0
+      },
+      "link_utilization": {
+        "wan-downlink": 0.6,
+        "wan-uplink": 1.0,
+        "isp-shared": 1.0
+      }
+    },
+    {
+      "time_s": 1.5,
+      "active_transfers": 2.0,
+      "aggregate_goodput_bps": 12519997.44,
+      "scheduler_ms": 0.0513,
+      "remaining_bytes": {
+        "dl-1": 0,
+        "dl-2": 0,
+        "dl-3": 12395533,
+        "ul-1": 0,
+        "ul-2": 0,
+        "ul-3": 5714337
+      },
+      "allocated_bps": {
+        "dl-1": 0.0,
+        "dl-2": 0.0,
+        "dl-3": 6291456.0,
+        "ul-1": 0.0,
+        "ul-2": 0.0,
+        "ul-3": 6291456.0
+      },
+      "link_utilization": {
+        "wan-downlink": 0.6,
+        "wan-uplink": 1.0,
+        "isp-shared": 1.0
+      }
+    },
+    {
+      "time_s": 1.6,
+      "active_transfers": 2.0,
+      "aggregate_goodput_bps": 12519997.44,
+      "scheduler_ms": 0.0416,
+      "remaining_bytes": {
+        "dl-1": 0,
+        "dl-2": 0,
+        "dl-3": 11769534,
+        "ul-1": 0,
+        "ul-2": 0,
+        "ul-3": 5088337
+      },
+      "allocated_bps": {
+        "dl-1": 0.0,
+        "dl-2": 0.0,
+        "dl-3": 6291456.0,
+        "ul-1": 0.0,
+        "ul-2": 0.0,
+        "ul-3": 6291456.0
+      },
+      "link_utilization": {
+        "wan-downlink": 0.6,
+        "wan-uplink": 1.0,
+        "isp-shared": 1.0
+      }
+    },
+    {
+      "time_s": 1.7,
+      "active_transfers": 2.0,
+      "aggregate_goodput_bps": 12519997.44,
+      "scheduler_ms": 0.0397,
+      "remaining_bytes": {
+        "dl-1": 0,
+        "dl-2": 0,
+        "dl-3": 11143534,
+        "ul-1": 0,
+        "ul-2": 0,
+        "ul-3": 4462338
+      },
+      "allocated_bps": {
+        "dl-1": 0.0,
+        "dl-2": 0.0,
+        "dl-3": 6291456.0,
+        "ul-1": 0.0,
+        "ul-2": 0.0,
+        "ul-3": 6291456.0
+      },
+      "link_utilization": {
+        "wan-downlink": 0.6,
+        "wan-uplink": 1.0,
+        "isp-shared": 1.0
+      }
+    },
+    {
+      "time_s": 1.8,
+      "active_transfers": 2.0,
+      "aggregate_goodput_bps": 12519997.44,
+      "scheduler_ms": 0.0392,
+      "remaining_bytes": {
+        "dl-1": 0,
+        "dl-2": 0,
+        "dl-3": 10517534,
+        "ul-1": 0,
+        "ul-2": 0,
+        "ul-3": 3836338
+      },
+      "allocated_bps": {
+        "dl-1": 0.0,
+        "dl-2": 0.0,
+        "dl-3": 6291456.0,
+        "ul-1": 0.0,
+        "ul-2": 0.0,
+        "ul-3": 6291456.0
+      },
+      "link_utilization": {
+        "wan-downlink": 0.6,
+        "wan-uplink": 1.0,
+        "isp-shared": 1.0
+      }
+    },
+    {
+      "time_s": 1.9,
+      "active_transfers": 2.0,
+      "aggregate_goodput_bps": 12519997.44,
+      "scheduler_ms": 0.0376,
+      "remaining_bytes": {
+        "dl-1": 0,
+        "dl-2": 0,
+        "dl-3": 9891534,
+        "ul-1": 0,
+        "ul-2": 0,
+        "ul-3": 3210338
+      },
+      "allocated_bps": {
+        "dl-1": 0.0,
+        "dl-2": 0.0,
+        "dl-3": 6291456.0,
+        "ul-1": 0.0,
+        "ul-2": 0.0,
+        "ul-3": 6291456.0
+      },
+      "link_utilization": {
+        "wan-downlink": 0.6,
+        "wan-uplink": 1.0,
+        "isp-shared": 1.0
+      }
+    },
+    {
+      "time_s": 2.0,
+      "active_transfers": 2.0,
+      "aggregate_goodput_bps": 12519997.44,
+      "scheduler_ms": 0.0396,
+      "remaining_bytes": {
+        "dl-1": 0,
+        "dl-2": 0,
+        "dl-3": 9265534,
+        "ul-1": 0,
+        "ul-2": 0,
+        "ul-3": 2584338
+      },
+      "allocated_bps": {
+        "dl-1": 0.0,
+        "dl-2": 0.0,
+        "dl-3": 6291456.0,
+        "ul-1": 0.0,
+        "ul-2": 0.0,
+        "ul-3": 6291456.0
+      },
+      "link_utilization": {
+        "wan-downlink": 0.6,
+        "wan-uplink": 1.0,
+        "isp-shared": 1.0
+      }
+    },
+    {
+      "time_s": 2.1,
+      "active_transfers": 2.0,
+      "aggregate_goodput_bps": 12519997.44,
+      "scheduler_ms": 0.05,
+      "remaining_bytes": {
+        "dl-1": 0,
+        "dl-2": 0,
+        "dl-3": 8639534,
+        "ul-1": 0,
+        "ul-2": 0,
+        "ul-3": 1958338
+      },
+      "allocated_bps": {
+        "dl-1": 0.0,
+        "dl-2": 0.0,
+        "dl-3": 6291456.0,
+        "ul-1": 0.0,
+        "ul-2": 0.0,
+        "ul-3": 6291456.0
+      },
+      "link_utilization": {
+        "wan-downlink": 0.6,
+        "wan-uplink": 1.0,
+        "isp-shared": 1.0
+      }
+    },
+    {
+      "time_s": 2.2,
+      "active_transfers": 2.0,
+      "aggregate_goodput_bps": 12519997.44,
+      "scheduler_ms": 0.0384,
+      "remaining_bytes": {
+        "dl-1": 0,
+        "dl-2": 0,
+        "dl-3": 8013534,
+        "ul-1": 0,
+        "ul-2": 0,
+        "ul-3": 1332338
+      },
+      "allocated_bps": {
+        "dl-1": 0.0,
+        "dl-2": 0.0,
+        "dl-3": 6291456.0,
+        "ul-1": 0.0,
+        "ul-2": 0.0,
+        "ul-3": 6291456.0
+      },
+      "link_utilization": {
+        "wan-downlink": 0.6,
+        "wan-uplink": 1.0,
+        "isp-shared": 1.0
+      }
+    },
+    {
+      "time_s": 2.3,
+      "active_transfers": 2.0,
+      "aggregate_goodput_bps": 12519997.44,
+      "scheduler_ms": 0.04,
+      "remaining_bytes": {
+        "dl-1": 0,
+        "dl-2": 0,
+        "dl-3": 7387534,
+        "ul-1": 0,
+        "ul-2": 0,
+        "ul-3": 706338
+      },
+      "allocated_bps": {
+        "dl-1": 0.0,
+        "dl-2": 0.0,
+        "dl-3": 6291456.0,
+        "ul-1": 0.0,
+        "ul-2": 0.0,
+        "ul-3": 6291456.0
+      },
+      "link_utilization": {
+        "wan-downlink": 0.6,
+        "wan-uplink": 1.0,
+        "isp-shared": 1.0
+      }
+    },
+    {
+      "time_s": 2.4,
+      "active_transfers": 2.0,
+      "aggregate_goodput_bps": 12519997.44,
+      "scheduler_ms": 0.0392,
+      "remaining_bytes": {
+        "dl-1": 0,
+        "dl-2": 0,
+        "dl-3": 6761535,
+        "ul-1": 0,
+        "ul-2": 0,
+        "ul-3": 80338
+      },
+      "allocated_bps": {
+        "dl-1": 0.0,
+        "dl-2": 0.0,
+        "dl-3": 6291456.0,
+        "ul-1": 0.0,
+        "ul-2": 0.0,
+        "ul-3": 6291456.0
+      },
+      "link_utilization": {
+        "wan-downlink": 0.6,
+        "wan-uplink": 1.0,
+        "isp-shared": 1.0
+      }
+    },
+    {
+      "time_s": 2.5,
+      "active_transfers": 1.0,
+      "aggregate_goodput_bps": 11236710.81,
+      "scheduler_ms": 0.0421,
+      "remaining_bytes": {
+        "dl-1": 0,
+        "dl-2": 0,
+        "dl-3": 5718201,
+        "ul-1": 0,
+        "ul-2": 0,
+        "ul-3": 0
+      },
+      "allocated_bps": {
+        "dl-1": 0.0,
+        "dl-2": 0.0,
+        "dl-3": 10485760.0,
+        "ul-1": 0.0,
+        "ul-2": 0.0,
+        "ul-3": 0.0
+      },
+      "link_utilization": {
+        "wan-downlink": 1.0,
+        "wan-uplink": 0.1283,
+        "isp-shared": 0.8975
+      }
+    },
+    {
+      "time_s": 2.6,
+      "active_transfers": 1.0,
+      "aggregate_goodput_bps": 10433331.2,
+      "scheduler_ms": 0.0304,
+      "remaining_bytes": {
+        "dl-1": 0,
+        "dl-2": 0,
+        "dl-3": 4674868,
+        "ul-1": 0,
+        "ul-2": 0,
+        "ul-3": 0
+      },
+      "allocated_bps": {
+        "dl-1": 0.0,
+        "dl-2": 0.0,
+        "dl-3": 10485760.0,
+        "ul-1": 0.0,
+        "ul-2": 0.0,
+        "ul-3": 0.0
+      },
+      "link_utilization": {
+        "wan-downlink": 1.0,
+        "wan-uplink": 0.0,
+        "isp-shared": 0.8333
+      }
+    },
+    {
+      "time_s": 2.7,
+      "active_transfers": 1.0,
+      "aggregate_goodput_bps": 10433331.2,
+      "scheduler_ms": 0.0292,
+      "remaining_bytes": {
+        "dl-1": 0,
+        "dl-2": 0,
+        "dl-3": 3631535,
+        "ul-1": 0,
+        "ul-2": 0,
+        "ul-3": 0
+      },
+      "allocated_bps": {
+        "dl-1": 0.0,
+        "dl-2": 0.0,
+        "dl-3": 10485760.0,
+        "ul-1": 0.0,
+        "ul-2": 0.0,
+        "ul-3": 0.0
+      },
+      "link_utilization": {
+        "wan-downlink": 1.0,
+        "wan-uplink": 0.0,
+        "isp-shared": 0.8333
+      }
+    },
+    {
+      "time_s": 2.8,
+      "active_transfers": 1.0,
+      "aggregate_goodput_bps": 10433331.2,
+      "scheduler_ms": 0.0527,
+      "remaining_bytes": {
+        "dl-1": 0,
+        "dl-2": 0,
+        "dl-3": 2588202,
+        "ul-1": 0,
+        "ul-2": 0,
+        "ul-3": 0
+      },
+      "allocated_bps": {
+        "dl-1": 0.0,
+        "dl-2": 0.0,
+        "dl-3": 10485760.0,
+        "ul-1": 0.0,
+        "ul-2": 0.0,
+        "ul-3": 0.0
+      },
+      "link_utilization": {
+        "wan-downlink": 1.0,
+        "wan-uplink": 0.0,
+        "isp-shared": 0.8333
+      }
+    },
+    {
+      "time_s": 2.9,
+      "active_transfers": 1.0,
+      "aggregate_goodput_bps": 10433331.2,
+      "scheduler_ms": 0.0356,
+      "remaining_bytes": {
+        "dl-1": 0,
+        "dl-2": 0,
+        "dl-3": 1544869,
+        "ul-1": 0,
+        "ul-2": 0,
+        "ul-3": 0
+      },
+      "allocated_bps": {
+        "dl-1": 0.0,
+        "dl-2": 0.0,
+        "dl-3": 10485760.0,
+        "ul-1": 0.0,
+        "ul-2": 0.0,
+        "ul-3": 0.0
+      },
+      "link_utilization": {
+        "wan-downlink": 1.0,
+        "wan-uplink": 0.0,
+        "isp-shared": 0.8333
+      }
+    },
+    {
+      "time_s": 3.0,
+      "active_transfers": 1.0,
+      "aggregate_goodput_bps": 10433331.2,
+      "scheduler_ms": 0.0296,
+      "remaining_bytes": {
+        "dl-1": 0,
+        "dl-2": 0,
+        "dl-3": 501536,
+        "ul-1": 0,
+        "ul-2": 0,
+        "ul-3": 0
+      },
+      "allocated_bps": {
+        "dl-1": 0.0,
+        "dl-2": 0.0,
+        "dl-3": 10485760.0,
+        "ul-1": 0.0,
+        "ul-2": 0.0,
+        "ul-3": 0.0
+      },
+      "link_utilization": {
+        "wan-downlink": 1.0,
+        "wan-uplink": 0.0,
+        "isp-shared": 0.8333
+      }
+    },
+    {
+      "time_s": 3.1,
+      "active_transfers": 0.0,
+      "aggregate_goodput_bps": 5015353.68,
+      "scheduler_ms": 0.0291,
+      "remaining_bytes": {
+        "dl-1": 0,
+        "dl-2": 0,
+        "dl-3": 0,
+        "ul-1": 0,
+        "ul-2": 0,
+        "ul-3": 0
+      },
+      "allocated_bps": {
+        "dl-1": 0.0,
+        "dl-2": 0.0,
+        "dl-3": 0.0,
+        "ul-1": 0.0,
+        "ul-2": 0.0,
+        "ul-3": 0.0
+      },
+      "link_utilization": {
+        "wan-downlink": 0.4807,
+        "wan-uplink": 0.0,
+        "isp-shared": 0.4006
+      }
+    }
+  ]
+}

@@ -1,101 +1,60 @@
-# FlashPort architecture
+# FlowWeave Architecture
 
-FlashPort keeps its deterministic simulator independent from its real HTTP transfer path.
-They share the same scheduling policy interface but do not share measurements or state.
+FlowWeave separates simulation, scheduling, telemetry, real HTTP transport, and presentation into independent modules that share one core set of domain models (`flowweave/models.py`).
+
+## Module Map
 
 ```text
- Sender browser -> raw upload -> private upload store -> delivery queue
-      |                                                |
-      |                                      receiver registration/jobs
-      |                                                |
-      +-------------------- FastAPI -------------------+
-                               |
-                          TransferServer <--- CLI HTTP Range client
-                               |
-                   TransferManager (in memory)
-                               |
-               Scheduler (Independent / Equal / SRPT / FlashPort)
-                               |
-               per-transfer shared token bucket
-                               |
-                    bounded async file stream
-                               |
-                      receiver browser
-                 progress + SHA-256 verification
-
- FastAPI also keeps simulation/comparison and benchmark APIs independent
- from live file delivery; saved experiment artifacts remain under results/.
+flowweave/
+├── models.py          # Shared domain models (LinkState, TransferSnapshot, MeasuredMetrics, EstimatedMetrics, ...)
+├── config.py          # Typed configuration dataclasses
+├── metrics.py         # FCT statistics, makespan, aggregate goodput, Jain's fairness index
+├── storage.py         # Thread-safe SQLite persistence (transfers, monitor history, experiment runs)
+├── coordinator.py     # Live periodic control loop tying monitor -> scheduler -> transfer manager -> storage
+├── cli.py             # CLI entrypoints (`serve`, `benchmark`, `live-benchmark`, `netem-script`)
+├── simulator/         # SimPy discrete-event network simulator & benchmark scenarios
+│   ├── topology.py    # LinkSpec, BandwidthEvent, TransferSpec, ScenarioSpec
+│   ├── engine.py      # Shared-link capacity enforcement, loss/latency, chunk pipelining, replication
+│   └── scenarios.py   # 6 reproducible benchmark topologies + scalability sweep
+├── scheduler/         # Pluggable scheduling policies behind one common Scheduler interface
+│   ├── base.py        # Scheduler ABC, effective capacity, remaining-time estimator
+│   ├── independent.py # Policy 1: Uncoordinated greedy baseline
+│   ├── max_min.py     # Policy 2: Max-min fair water-filling
+│   ├── srpt.py        # Policy 3: Shortest Predicted Remaining Completion Time
+│   └── flowweave.py   # Policy 4: Cooperative, congestion-aware fairness-guarded scheduler
+├── monitor/           # Transfer & link telemetry (strictly separates measured vs estimated)
+│   └── monitor.py
+├── straggler/         # Cost-benefit slow-chunk detection and speculative replication policy
+│   └── detector.py
+├── transfer/          # Real async HTTP download engine (asyncio + aiohttp)
+│   ├── rate_limiter.py # Live-adjustable async token bucket
+│   ├── engine.py      # HTTP Range parallel chunks, retries, reassembly, SHA-256, single-stream fallback
+│   ├── manager.py     # Multi-transfer orchestration and rate application
+│   └── test_server.py # Embedded aiohttp HTTP Range server (plus /noranges fallback route)
+├── experiments/       # Reproducible multi-policy evaluation & Linux tc/iperf3 harness
+│   ├── runner.py      # Runs all 4 policies with identical seeds, outputs JSON/CSV/Markdown/PNGs
+│   └── netem.py       # Linux `tc` (tbf + netem) and `iperf3 -J` integration + bash generator
+└── api/
+    └── app.py         # FastAPI REST backend + static frontend serving
 ```
 
-## Components and boundaries
+## Key Architectural Decisions
 
-### FastAPI application
+### 1. Explicit Separation of Measured vs Estimated Metrics
+`NetworkMonitor` maintains two separate dataclasses per transfer:
+- `MeasuredMetrics`: raw, directly observed counters (`bytes_acked`, `raw_bytes_received`, `redundant_bytes`, `instant_goodput_bps`, `avg_goodput_bps`, `last_rtt_ms`, `retries`).
+- `EstimatedMetrics`: EWMA-smoothed predictions (`ewma_goodput_bps`, `ewma_rtt_ms`, `predicted_remaining_time_s`, `estimated_bottleneck_bps`, `confidence`).
 
-`flashport.api.main.create_app` builds the service and its lifespan. The transfer manager,
-scheduler loop, monitor, receiver registry, upload registry, delivery status, and rate buckets
-are process-local. Run one Uvicorn worker to keep a single shared capacity budget. The main
-browser page focuses on sending and receiving files; simulation and benchmark APIs remain
-separate and do not supply simulated data to the sharing UI.
+This prevents downstream components from mistaking noisy cold-start or starved EWMA values for ground truth—a critical safeguard that avoided SRPT priority inversion when paused flows decay toward zero observed goodput.
 
-### Safe file service
+### 2. Shared Scheduler Interface Across Simulation and Live Downloads
+Both `NetworkSimulator` (SimPy discrete-event ticks) and `FlowWeaveCoordinator` (real `asyncio` control loop) construct the exact same `SchedulerInput(now, transfers, links)` and consume the same `ScheduleDecision(allocations_bps, link_assignments)`. A policy tested in simulation runs unmodified against real HTTP downloads.
 
-`TransferServer` serves direct files under the configured shared directory and accepts raw
-browser uploads of up to 1 GB into a private `.flashport-uploads/` subdirectory. Upload
-filenames are validated, stored under generated names, and never appear in the ordinary file
-listing. File content is read in bounded blocks; full files are never loaded into server
-memory. Registration computes a streaming SHA-256 and captures a file identity so a source
-modified during a transfer is rejected.
+### 3. Live Token-Bucket Pacing Without Connection Churn
+Rather than tearing down and reopening HTTP sockets whenever priorities change, each managed transfer owns a dynamic `AsyncRateLimiter`. On each control tick (`control_interval_s = 0.25s`), `TransferManager.apply_decision()` updates `limiter.set_rate(bps)` in place. Rate increases take effect within milliseconds while persistent TCP connections remain warm.
 
-One transfer registration produces a random transfer ID and bearer token. A client requests
-one byte range per response. Successful served intervals are merged, so retries/overlaps do
-not inflate coverage. The server will not mark a transfer complete unless all file bytes
-have been served, the client reports the full byte count, and its submitted final hash equals
-the registered source hash.
+### 4. Conservative Straggler Handling in Real Transfers
+Speculative chunk replication is fully active in the simulator (where alternate mirrors and controlled straggler events are modeled directly) and governed by a cost-benefit gate plus a redundant-byte cap. In the live HTTP engine, `StragglerConfig.allow_real_replication` defaults to `False`: stragglers are detected and surfaced in `/api/monitor` without generating speculative duplicate WAN traffic unless explicitly enabled.
 
-The browser receiver registers a name and heartbeats while its page remains open. A sender
-selects online receiver IDs; the server creates one normal scheduler-managed transfer per
-receiver. Each receiver polls for jobs, downloads the actual bytes using its transfer token,
-reports progress, checks SHA-256, and saves the result through a browser download. The sender
-polls a delivery record that aggregates each receiver's transfer state.
-
-### Transfer manager and scheduler
-
-The manager holds filename, client ID, total/downloaded/remaining bytes, served bytes,
-active connections, lifecycle timestamps, throughput observations, and allocation. The
-scheduler re-evaluates active logical transfers periodically and on each loop tick. It
-checks nonnegative finite allocations and enforces the configured capacity before updating
-rate limiters. Completed, paused, and queued transfers do not receive rates.
-
-All range connections belonging to one transfer share exactly one token bucket. A second
-logical transfer gets its own bucket at the policy's allocated rate. Since the rates are
-allocated as a bounded sum, one multi-range client cannot multiply its share by opening more
-connections. See [network_model.md](network_model.md) for rate units and measurement caveats.
-
-### Client
-
-`TransferClient` uses aiohttp with a global per-client range-request semaphore. It divides a
-file into configurable non-overlapping chunks, writes each response at the correct offset,
-and atomically records successful chunk hashes in a local resume manifest. A restart can
-reuse a live server transfer token; after a server restart, the client asks the new server
-to validate saved chunk hashes against the source before treating them as served. The final
-whole-file digest is checked before the `.part` file is renamed to its destination.
-Browser receivers use the same token-authorized content and progress/completion endpoints,
-then verify the response and initiate a local browser download.
-
-### Monitoring
-
-The network monitor distinguishes server stream bytes from client-reported stored progress.
-Actual completed-flow completion times, makespan, aggregate goodput, and Jain fairness are
-computed from verified completions. Client-reported HTTP response-header latency is
-described as application request latency, not raw TCP RTT. Packet loss and retransmission
-statistics are explicitly marked unavailable. These measurements remain available through
-the API; the minimal file-sharing page does not display charts or analytics.
-
-### Simulation and reports
-
-`SimulationEngine`, scenario generation, metrics, and the 14-scenario benchmark suite remain
-standalone. `/api/simulation/comparison` returns `"measurement_type": "simulation"`.
-Benchmark CSV/JSON/report/graphs are stored under `results/`; actual transfer metrics are
-served from `/api/network/metrics` with `"measurement_type": "actual_application"`.
-
-No machine-learning or additional scheduler policy was found in the repository inventory.
+### 5. SQLite Persistence
+SQLite stores transfer records, rolling monitor samples (bounded to the latest 300 ticks), and experiment comparison summaries with zero external database setup.
